@@ -1,9 +1,3 @@
-/****************************************************
- * cf-nav · 最终成品
- * 前后台一体 + 哪吒官方主题
- * Cloudflare Workers + KV
- ****************************************************/
-
 const HTML = `
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -13,13 +7,16 @@ const HTML = `
 <title>cf-nav</title>
 
 <style>
-/* ========= 全局 / 哪吒官方主题 ========= */
+/* =========================
+   哪吒 · 探针黑 · 极简主题
+========================= */
 :root{
-  --red:#C92A2A;
-  --orange:#FF6A00;
-  --dark:#0F1115;
-  --panel:#161A20;
-  --green:#00C2A8;
+  --bg:#0B0E11;
+  --panel:#13161B;
+  --line:#1F2329;
+  --red:#E53935;
+  --text:#E6E6E6;
+  --muted:#9AA0A6;
 }
 
 *{box-sizing:border-box}
@@ -31,105 +28,101 @@ html,body{
 }
 
 body{
-  background:
-    linear-gradient(135deg,
-      rgba(201,42,42,.55),
-      rgba(255,106,0,.35),
-      rgba(15,17,21,.9)
-    ),
-    url("https://api.tomys.top/api/acgimg");
-  background-size:cover;
-  background-attachment:fixed;
-  color:#eee;
+  background:var(--bg);
+  color:var(--text);
 }
 
-/* ========= 顶部 ========= */
+/* 顶部 */
 .header{
   position:sticky;
   top:0;
   z-index:10;
-  padding:16px;
-  background:rgba(15,17,21,.75);
-  backdrop-filter:blur(14px);
-  border-bottom:1px solid rgba(255,106,0,.3);
+  padding:14px;
+  background:var(--panel);
+  border-bottom:1px solid var(--line);
 }
 
 .search{
   max-width:720px;
   margin:auto;
   display:flex;
-  background:rgba(22,26,32,.85);
-  border-radius:10px;
-  overflow:hidden;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:8px;
 }
 
 .search input{
   flex:1;
-  padding:14px;
+  padding:12px;
   background:none;
   border:none;
   outline:none;
-  color:#fff;
-  font-size:16px;
+  color:var(--text);
 }
 
 .search button{
-  padding:0 22px;
+  width:50px;
   border:none;
-  cursor:pointer;
-  background:linear-gradient(135deg,var(--red),var(--orange));
+  background:var(--red);
   color:#fff;
-  font-size:18px;
+  cursor:pointer;
 }
 
-/* ========= 主体 ========= */
+/* 主体 */
 .container{
   max-width:1200px;
-  margin:40px auto;
+  margin:24px auto;
   padding:0 16px;
+}
+
+.section{
+  margin-bottom:24px;
+}
+
+.section h2{
+  margin:0 0 10px;
+  font-size:15px;
+  color:var(--muted);
 }
 
 .grid{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
-  gap:20px;
+  gap:14px;
 }
 
 .card{
-  background:rgba(22,26,32,.82);
-  border-left:4px solid var(--red);
-  border-radius:10px;
-  padding:16px;
+  background:var(--panel);
+  border-left:3px solid var(--red);
+  padding:14px;
+  border-radius:6px;
   cursor:pointer;
-  transition:.25s;
 }
 
 .card:hover{
-  border-left-color:var(--orange);
-  transform:translateY(-6px) scale(1.03);
-  box-shadow:0 0 18px rgba(255,106,0,.45);
+  background:#161A20;
 }
 
 .card h3{
-  margin:0 0 6px;
-  font-size:16px;
+  margin:0 0 4px;
+  font-size:14px;
 }
 
 .card p{
   margin:0;
   font-size:12px;
-  opacity:.7;
+  color:var(--muted);
   word-break:break-all;
 }
 
-/* ========= 右下角按钮 ========= */
+/* 右下角按钮 */
 .fab{
   position:fixed;
-  right:20px;
-  bottom:20px;
+  right:18px;
+  bottom:18px;
   display:flex;
   flex-direction:column;
-  gap:12px;
+  gap:10px;
 }
 
 .fab button{
@@ -137,17 +130,17 @@ body{
   height:44px;
   border-radius:50%;
   border:none;
-  cursor:pointer;
-  background:linear-gradient(135deg,var(--red),var(--orange));
+  background:var(--red);
   color:#fff;
   font-size:18px;
+  cursor:pointer;
 }
 
-/* ========= 弹窗 ========= */
+/* 弹窗 */
 .modal{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.6);
+  background:rgba(0,0,0,.7);
   display:none;
   align-items:center;
   justify-content:center;
@@ -156,37 +149,38 @@ body{
 .box{
   width:320px;
   background:var(--panel);
-  padding:20px;
-  border-radius:10px;
+  border:1px solid var(--line);
+  padding:16px;
+  border-radius:8px;
 }
 
-.box h2{
+.box h3{
   margin:0 0 12px;
 }
 
-.box input{
+.box input, .box select{
   width:100%;
   padding:10px;
   margin-bottom:10px;
-  background:#222;
-  border:1px solid #333;
-  color:#fff;
+  background:#0E1116;
+  border:1px solid var(--line);
+  color:var(--text);
 }
 
 .box button{
   width:100%;
   padding:10px;
-  background:linear-gradient(135deg,var(--red),var(--orange));
   border:none;
+  background:var(--red);
   color:#fff;
   cursor:pointer;
 }
 
 .footer{
   text-align:center;
-  opacity:.5;
   padding:30px;
-  font-size:13px;
+  font-size:12px;
+  color:var(--muted);
 }
 </style>
 </head>
@@ -196,56 +190,114 @@ body{
 <div class="header">
   <div class="search">
     <input id="q" placeholder="搜索书签">
-    <button onclick="doSearch()">🔍</button>
+    <button onclick="search()">🔍</button>
   </div>
 </div>
 
-<div class="container">
-  <div class="grid" id="list"></div>
-</div>
+<div class="container" id="content"></div>
 
-<div class="footer">cf-nav · 哪吒主题</div>
+<div class="footer">cf-nav · 哪吒探针黑</div>
 
 <div class="fab">
   <button onclick="showLogin()">🔐</button>
-  <button onclick="showAdmin()">⚙️</button>
+  <button onclick="showAdd()">➕</button>
 </div>
 
+<!-- 登录 -->
 <div class="modal" id="login">
   <div class="box">
-    <h2>登录</h2>
+    <h3>登录</h3>
     <input id="pwd" type="password" placeholder="ADMIN_PASSWORD">
     <button onclick="login()">登录</button>
   </div>
 </div>
 
-<script>
-let links = [];
+<!-- 添加 -->
+<div class="modal" id="add">
+  <div class="box">
+    <h3>添加链接</h3>
+    <input id="name" placeholder="名称">
+    <input id="url" placeholder="URL">
+    <input id="cat" placeholder="分类">
+    <label><input type="checkbox" id="pri"> 私密</label>
+    <button onclick="add()">保存</button>
+  </div>
+</div>
 
-function render(arr){
-  const el=document.getElementById("list");
-  el.innerHTML="";
-  arr.forEach(l=>{
-    const d=document.createElement("div");
-    d.className="card";
-    d.innerHTML=\`<h3>\${l.name}</h3><p>\${l.url}</p>\`;
-    d.onclick=()=>window.open(l.url,"_blank");
-    el.appendChild(d);
+<script>
+let links=[];
+let authed=false;
+
+function render(){
+  const c=document.getElementById("content");
+  c.innerHTML="";
+  const map={};
+  links.forEach(l=>{
+    if(l.private && !authed) return;
+    map[l.category]=map[l.category]||[];
+    map[l.category].push(l);
+  });
+  Object.keys(map).forEach(cat=>{
+    const s=document.createElement("div");
+    s.className="section";
+    s.innerHTML=\`<h2>\${cat}</h2>\`;
+    const g=document.createElement("div");
+    g.className="grid";
+    map[cat].forEach(l=>{
+      const d=document.createElement("div");
+      d.className="card";
+      d.innerHTML=\`<h3>\${l.name}</h3><p>\${l.url}</p>\`;
+      d.onclick=()=>window.open(l.url,"_blank");
+      g.appendChild(d);
+    });
+    s.appendChild(g);
+    c.appendChild(s);
   });
 }
 
-function doSearch(){
+function search(){
   const q=document.getElementById("q").value.toLowerCase();
-  render(links.filter(l=>l.name.toLowerCase().includes(q)||l.url.toLowerCase().includes(q)));
+  renderFiltered(q);
+}
+
+function renderFiltered(q){
+  const c=document.getElementById("content");
+  c.innerHTML="";
+  const g=document.createElement("div");
+  g.className="grid";
+  links.forEach(l=>{
+    if(l.private && !authed) return;
+    if(l.name.toLowerCase().includes(q)||l.url.toLowerCase().includes(q)){
+      const d=document.createElement("div");
+      d.className="card";
+      d.innerHTML=\`<h3>\${l.name}</h3><p>\${l.url}</p>\`;
+      d.onclick=()=>window.open(l.url,"_blank");
+      g.appendChild(d);
+    }
+  });
+  c.appendChild(g);
 }
 
 function showLogin(){document.getElementById("login").style.display="flex";}
-function login(){alert("后台功能已启用（示例版），KV/管理逻辑可继续扩展");}
+function showAdd(){ if(!authed)return alert("请先登录"); document.getElementById("add").style.display="flex"; }
 
-fetch("/api/links").then(r=>r.json()).then(d=>{
-  links=d;
-  render(links);
-});
+function login(){
+  fetch("/api/login",{method:"POST",body:document.getElementById("pwd").value})
+    .then(r=>r.ok?(authed=true,document.getElementById("login").style.display="none",load()):alert("密码错误"));
+}
+
+function add(){
+  fetch("/api/add",{method:"POST",headers:{'content-type':'application/json'},
+    body:JSON.stringify({
+      name:name.value,url:url.value,category:cat.value,private:pri.checked
+    })}).then(()=>{add.style.display="none";load();});
+}
+
+function load(){
+  fetch("/api/list").then(r=>r.json()).then(d=>{links=d;render();});
+}
+
+load();
 </script>
 
 </body>
@@ -253,16 +305,28 @@ fetch("/api/links").then(r=>r.json()).then(d=>{
 `;
 
 export default {
-  async fetch(request, env) {
-    const url = new URL(request.url);
+  async fetch(req, env) {
+    const url=new URL(req.url);
+    const key="links";
+    const pwd=env.ADMIN_PASSWORD;
 
-    if (url.pathname === "/api/links") {
-      const data = await env.CARD_ORDER.get("links");
-      return new Response(data || "[]", { headers:{ "content-type":"application/json" }});
+    if(url.pathname==="/api/list"){
+      const d=await env.CARD_ORDER.get(key);
+      return new Response(d||"[]",{headers:{'content-type':'application/json'}});
     }
 
-    return new Response(HTML, {
-      headers:{ "content-type":"text/html;charset=UTF-8" }
-    });
+    if(url.pathname==="/api/login"){
+      const t=await req.text();
+      return new Response(null,{status:t===pwd?200:403});
+    }
+
+    if(url.pathname==="/api/add"){
+      const arr=JSON.parse(await env.CARD_ORDER.get(key)||"[]");
+      arr.push(await req.json());
+      await env.CARD_ORDER.put(key,JSON.stringify(arr));
+      return new Response("ok");
+    }
+
+    return new Response(HTML,{headers:{'content-type':'text/html;charset=UTF-8'}});
   }
 };
