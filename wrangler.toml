@@ -1,0 +1,12 @@
+name = "cf-nav2"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[kv_namespaces]]
+binding = "CARD_ORDER"
+id = "96e99cc96d914b0d8d1baa2582a6bb04"
+preview_id = ""
+
+[vars]
+ADMIN_PASSWORD = "root"
