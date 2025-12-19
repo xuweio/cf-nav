@@ -4,23 +4,17 @@ const HTML_CONTENT = `
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>天下有雪-我的个人导航</title>
+    <title>Card Tab</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>⭐</text></svg>">
     <style>
     /* 全局样式 */
-    html, body {
-        height: 100%;
-        width: 100%;
-        margin: 0;
-        padding: 0;
-    }
-    
     body {
         font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-        background-color: #121418; /* 深色背景作为底色 */
+        margin: 0;
+        padding: 0;
+        background-color: #f8f6f2; /* 米白色背景 */
         color: #222; /* 深灰字体 */
         transition: all 0.3s ease;
-     
     }
 
     /* 暗色模式样式 */
@@ -35,7 +29,7 @@ const HTML_CONTENT = `
         top: 0;
         left: 0;
         right: 0;
-        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0) 100%); /* 渐变背景 */
+        background-color: #f8f6f2; /* 与整体背景一致 */
         z-index: 1000;
         padding: 10px;
         transition: all 0.3s ease;
@@ -44,7 +38,7 @@ const HTML_CONTENT = `
     }
 
     body.dark-theme .fixed-elements {
-        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0) 100%); /* 暗色渐变背景 */
+        background-color: #121418; /* 与暗色主题背景完全一致 */
         box-shadow: none; /* 移除阴影 */
     }
 
@@ -53,27 +47,25 @@ const HTML_CONTENT = `
     .category-button {
         padding: 5px 10px;
         border-radius: 15px;
-        background-color: rgba(249, 250, 251, 0.85);
+        background-color: #f9fafb;
         color: #43b883;
         border: none;
         cursor: pointer;
         font-size: 12px;
         font-weight: 500;
         transition: all 0.2s ease;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
         flex: 0 0 auto;
         white-space: nowrap;
         margin: 0 2px;
         position: relative;
         overflow: hidden;
-        backdrop-filter: blur(2px);
     }
 
     body.dark-theme .category-button {
-        background-color: rgba(42, 46, 56, 0.85);
-        color: #7ba1e9;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        backdrop-filter: blur(2px);
+        background-color: #2a2e38;
+        color: #5d7fb9;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
 
     .category-button:hover {
@@ -101,43 +93,49 @@ const HTML_CONTENT = `
 
     /* 分类按钮悬停样式 */
 
-    /* 移除顶部标题，改为底部显示 */
     .fixed-elements h3 {
-        display: none; /* 隐藏顶部标题 */
+        position: absolute;
+        top: 10px;
+        left: 20px;
+        margin: 0;
+        font-size: 22px;
+        font-weight: 600;
+        color: #222;
+        transition: all 0.3s ease;
     }
 
     body.dark-theme .fixed-elements h3 {
-        color: #fff;
-        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+        color: #e3e3e3;
     }
 
     /* 一言模块样式 */
     #hitokoto {
         margin: 5px 0 15px;
         font-size: 14px;
-        color: #fff;
+        color: #888;
         font-style: italic;
         max-width: 600px;
         margin-left: auto;
         margin-right: auto;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
         transition: all 0.3s ease;
     }
 
-    #hitokoto span {
-        color: #4dffb8;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    #hitokoto a {
+        color: #43b883;
+        text-decoration: none;
         transition: all 0.3s ease;
+    }
+
+    #hitokoto a:hover {
+        color: #35a674;
     }
 
     body.dark-theme #hitokoto {
-        color: #fff;
-        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+        color: #a0a0a0;
     }
 
-    body.dark-theme #hitokoto span {
-        color: #7ba1e9;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    body.dark-theme #hitokoto a {
+        color: #5d7fb9;
     }
 
     /* 中心内容样式 */
@@ -152,9 +150,15 @@ const HTML_CONTENT = `
         padding: 0 10px; /* 添加左右内边距 */
     }
 
-    /* 右上角控制区域样式 - 隐藏 */
+    /* 右上角控制区域样式 */
     .top-right-controls {
-        display: none; /* 隐藏顶部控制区域 */
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        z-index: 1001;
     }
 
     /* 设置按钮样式 */
@@ -237,6 +241,98 @@ const HTML_CONTENT = `
 
     body.dark-theme .github-btn svg {
         fill: #5d7fb9;
+    }
+
+    /* 书签搜索图标按钮样式 */
+    .bookmark-search-toggle {
+        background-color: #43b883;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 0;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        position: relative;
+    }
+
+    .bookmark-search-toggle:hover {
+        background-color: #35a674;
+        transform: translateY(-2px);
+    }
+
+    .bookmark-search-toggle svg {
+        width: 20px;
+        height: 20px;
+        stroke: white;
+    }
+
+    body.dark-theme .bookmark-search-toggle {
+        background-color: #5d7fb9;
+    }
+
+    body.dark-theme .bookmark-search-toggle:hover {
+        background-color: #4a6fa5;
+    }
+
+    /* 下拉书签搜索框样式 */
+    .bookmark-search-dropdown {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        width: 140px;
+        background-color: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        padding: 8px;
+        margin-top: 4px;
+        display: none;
+        z-index: 1002;
+    }
+
+    .bookmark-search-dropdown.show {
+        display: block;
+    }
+
+    .bookmark-search-dropdown input {
+        width: 100%;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        padding: 8px 12px;
+        font-size: 13px;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+
+    .bookmark-search-dropdown input:focus {
+        border-color: #43b883;
+        box-shadow: 0 0 0 2px rgba(67, 184, 131, 0.2);
+        outline: none;
+    }
+
+    .bookmark-search-dropdown input::placeholder {
+        color: #999;
+    }
+
+    body.dark-theme .bookmark-search-dropdown {
+        background-color: #323642;
+        border-color: #444;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    body.dark-theme .bookmark-search-dropdown input {
+        background-color: #252830;
+        color: #e3e3e3;
+        border-color: #444;
+    }
+
+    body.dark-theme .bookmark-search-dropdown input::placeholder {
+        color: #888;
     }
 
     /* 登录弹窗样式 */
@@ -423,15 +519,13 @@ const HTML_CONTENT = `
         align-items: center;
         margin-bottom: 20px;
         padding: 15px;
-        background-color: rgba(248, 249, 250, 0.7);
-        backdrop-filter: blur(5px);
+        background-color: #f8f9fa;
         border-radius: 8px;
         border-left: 4px solid #43b883;
     }
 
     body.dark-theme .search-results-header {
-        background-color: rgba(45, 55, 72, 0.7);
-        backdrop-filter: blur(5px);
+        background-color: #2d3748;
         border-left-color: #5d7fb9;
     }
 
@@ -563,9 +657,8 @@ const HTML_CONTENT = `
         border-radius: 8px;
         overflow: hidden;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        border: 1px solid rgba(224, 224, 224, 0.5);
+        border: 1px solid #e0e0e0;
         transition: all 0.3s ease;
-        backdrop-filter: blur(5px);
     }
 
     .search-bar:focus-within {
@@ -575,7 +668,7 @@ const HTML_CONTENT = `
 
     .search-bar select {
         border: none;
-        background-color: rgba(244, 247, 250, 0.7);
+        background-color: #f4f7fa;
         padding: 10px 15px;
         font-size: 14px;
         color: #43b883;
@@ -604,19 +697,18 @@ const HTML_CONTENT = `
 
     /* 暗色主题搜索栏样式 */
     body.dark-theme .search-bar {
-        border-color: rgba(50, 54, 66, 0.5);
-        background-color: rgba(30, 33, 40, 0.5);
-        backdrop-filter: blur(5px);
+        border-color: #323642;
+        background-color: #1e2128;
     }
 
     body.dark-theme .search-bar select {
-        background-color: rgba(37, 40, 48, 0.7);
+        background-color: #252830;
         color: #5d7fb9;
         background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="6" viewBox="0 0 12 6"><path fill="%235d7fb9" d="M0 0l6 6 6-6z"/></svg>');
     }
 
     body.dark-theme .search-bar input {
-        background-color: rgba(37, 40, 48, 0.7);
+        background-color: #252830;
         color: #e3e3e3;
     }
 
@@ -636,7 +728,7 @@ const HTML_CONTENT = `
         border: none;
         padding: 10px 15px;
         font-size: 14px;
-        background-color: rgba(255, 255, 255, 0.7);
+        background-color: #fff;
         outline: none;
     }
 
@@ -724,7 +816,7 @@ const HTML_CONTENT = `
         gap: 15px;
         z-index: 1000;
     }
-    
+
     .floating-button-group button {
         width: 40px;
         height: 40px;
@@ -883,23 +975,11 @@ const HTML_CONTENT = `
     .section-title {
         font-size: 22px;
         font-weight: 600;
-        color: #ffffff;
+        color: #222;
         position: relative;
         padding-left: 15px;
         transition: color 0.3s ease;
         min-width: 120px;
-    }
-    
-    @media (max-width: 480px) {
-        .section-title {
-            font-size: 18px;
-            padding-left: 12px;
-            min-width: 90px;
-            max-width: 200px; /* 限制最大宽度 */
-            white-space: nowrap; /* 不换行 */
-            overflow: hidden; /* 隐藏溢出 */
-            text-overflow: ellipsis; /* 显示省略号 */
-        }
     }
 
     body.dark-theme .section-title {
@@ -916,13 +996,6 @@ const HTML_CONTENT = `
         height: 22px;
         background-color: #43b883;
         border-radius: 2px;
-    }
-    
-    @media (max-width: 480px) {
-        .section-title:before {
-            width: 4px;
-            height: 18px;
-        }
     }
 
     .delete-category-btn {
@@ -961,7 +1034,7 @@ const HTML_CONTENT = `
     }
 
     .card {
-        background-color: rgba(255, 255, 255, 0.8);
+        background-color: white;
         border-radius: 8px;
         padding: 12px;
         width: 150px;
@@ -975,41 +1048,12 @@ const HTML_CONTENT = `
         animation-delay: calc(var(--card-index) * 0.05s);
         opacity: 0;
         margin: 2px;
-        backdrop-filter: blur(3px);
-    }
-    
-    /* 链接状态样式 */
-    .card.status-ok {
-        border-left: 3px solid #43b883; /* 绿色表示正常 */
-    }
-    
-    .card.status-error {
-        border-left: 3px solid #e74c3c; /* 红色表示异常/失败 */
-    }
-    
-    .card.status-warning {
-        border-left: 3px solid #9b59b6; /* 紫色表示警告 */
-    }
-    
-    /* 状态指示器标签 */
-    .status-tag {
-        position: absolute;
-        top: 0;
-        right: 0;
-        background-color: #e74c3c;
-        color: white;
-        font-size: 10px;
-        padding: 2px 5px;
-        border-radius: 0 8px 0 5px;
-        opacity: 0.8;
-        z-index: 10;
     }
 
     body.dark-theme .card {
-        background-color: rgba(30, 33, 40, 0.8); /* 半透明卡片背景 */
+        background-color: #1e2128; /* 卡片背景 */
         border-left-color: #5d7fb9;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        backdrop-filter: blur(3px);
     }
 
     @keyframes fadeIn {
@@ -1072,11 +1116,6 @@ const HTML_CONTENT = `
         right: 5px;
         z-index: 5;
     }
-    
-    /* 当卡片同时有状态标签和私密标签时，调整私密标签位置 */
-    .card.status-error .private-tag {
-        top: 36px; /* 向下移动，避免与状态标签重叠 */
-    }
 
 
 
@@ -1089,89 +1128,28 @@ const HTML_CONTENT = `
         left: 0;
         width: 100%;
         height: 40px;
-        background: linear-gradient(to top, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0) 100%);
+        background-color: rgba(255, 255, 255, 0.9);
         display: flex;
-        justify-content: center; /* 居中显示 */
+        justify-content: center;
         align-items: center;
         font-size: 14px;
         z-index: 1000;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.03);
+        backdrop-filter: blur(5px);
         transition: all 0.3s ease;
-    }
-    
-    @media (max-width: 480px) {
-        #copyright {
-            height: 40px; /* 增加高度以容纳按钮 */
-            font-size: 12px;
-        }
-        
-        #copyright .copyright-container {
-            gap: 10px; /* 减小元素间距 */
-        }
-        
-        #copyright p {
-            display: none; /* 在移动设备上隐藏版权信息 */
-        }
     }
 
     #copyright p {
         margin: 0;
         font-weight: 500;
-        color: #fff;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
-    }
-    
-    /* 底部标题样式 */
-    #copyright .site-title {
-        font-size: 18px;
-        font-weight: 600;
-        margin-right: 15px;
-        color: #fff;
-        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
-    }
-    
-    /* 底部版权信息容器 */
-    #copyright .copyright-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 20px; /* 元素之间的间距 */
-        max-width: 800px; /* 限制最大宽度 */
-        width: 100%;
-    }
-    
-    /* 底部按钮组 */
-    #copyright .buttons-group {
-        display: flex;
-        align-items: center;
-        gap: 10px; /* 按钮之间的间距 */
-    }
-    
-    /* 底部按钮样式 */
-    #copyright .admin-btn,
-    #copyright .login-btn {
-        padding: 5px 10px;
-        font-size: 12px;
-    }
-    
-    @media (max-width: 480px) {
-        #copyright .site-title {
-            font-size: 16px;
-            margin-right: 10px;
-        }
-        
-        #copyright .admin-btn,
-        #copyright .login-btn {
-            padding: 4px 8px;
-            font-size: 11px;
-        }
+        color: #666;
     }
 
     #copyright a {
-        color: #4dffb8;
+        color: #43b883;
         text-decoration: none;
         transition: all 0.3s ease;
         position: relative;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
     }
 
     #copyright a:after {
@@ -1181,7 +1159,7 @@ const HTML_CONTENT = `
         height: 1px;
         bottom: 0;
         left: 0;
-        background-color: #4dffb8;
+        background-color: #43b883;
         transform: scaleX(0);
         transition: transform 0.3s ease;
     }
@@ -1191,56 +1169,53 @@ const HTML_CONTENT = `
     }
 
     body.dark-theme #copyright {
-        background: linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 100%);
+        background-color: rgba(37, 40, 48, 0.9);
         color: #e3e3e3;
     }
 
     body.dark-theme #copyright a {
-        color: #7ba1e9;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+        color: #5d7fb9;
     }
 
     body.dark-theme #copyright a:after {
-        background-color: #7ba1e9;
+        background-color: #5d7fb9;
     }
 
     /* 响应式设计 */
     @media (max-width: 480px) {
         .fixed-elements {
             position: fixed; /* 恢复固定定位，确保分类按钮位置正确 */
-            padding: 5px 10px 3px 10px; /* 更紧凑的内边距 */
+            padding: 8px 12px 5px 12px; /* 紧凑的内边距 */
             height: auto;
-            min-height: 100px; /* 减小最小高度 */
+            min-height: 140px; /* 增加最小高度，确保有足够空间 */
             box-shadow: none; /* 移除阴影 */
-            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0) 100%); /* 渐变背景 */
         }
 
         body.dark-theme .fixed-elements {
             box-shadow: none; /* 移除阴影 */
-            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0) 100%); /* 暗色渐变背景 */
         }
 
         /* 移动端一言样式调整 - 紧凑显示 */
         #hitokoto {
-            margin: 2px 0 4px 0; /* 更紧凑的上下边距 */
-            font-size: 11px; /* 进一步减小字体 */
-            line-height: 1.2; /* 更紧凑行高 */
-            padding: 0 5px; /* 减小左右内边距 */
+            margin: 3px 0 6px 0; /* 紧凑的上下边距 */
+            font-size: 12px; /* 减小字体 */
+            line-height: 1.3; /* 紧凑行高 */
+            padding: 0 8px; /* 左右内边距 */
         }
 
         .category-buttons-container {
             width: 100%;
             max-width: none;
-            padding: 4px;
+            padding: 6px;
             overflow-x: auto; /* 允许水平滚动 */
             flex-wrap: nowrap; /* 不允许按钮换行 */
             justify-content: flex-start; /* 左对齐排列按钮 */
-            margin: 5px auto 3px; /* 更紧凑的分类按钮边距 */
+            margin: 8px auto 5px; /* 紧凑的分类按钮边距 */
             scrollbar-width: none; /* Firefox */
             -ms-overflow-style: none; /* IE and Edge */
             background-color: transparent; /* 移动端也透明 */
             border-radius: 8px;
-            gap: 3px; /* 更减小按钮间距 */
+            gap: 4px; /* 减小按钮间距 */
         }
 
         body.dark-theme .category-buttons-container {
@@ -1248,15 +1223,15 @@ const HTML_CONTENT = `
         }
 
         .category-button {
-            padding: 3px 6px;
-            font-size: 10px;
+            padding: 4px 8px;
+            font-size: 11px;
             margin: 0 1px;
         }
 
         .content {
-            margin-top: 110px; /* 减小顶部边距 */
-            margin-bottom: 80px; /* 减小底部边距 */
-            padding: 10px; /* 减小内边距 */
+            margin-top: 150px; /* 增加顶部边距，适配更高的固定元素 */
+            margin-bottom: 100px; /* 为底部的分类按钮和版权信息留出空间 */
+            padding: 15px; /* 保持内边距 */
             transition: opacity 0.3s ease;
         }
 
@@ -1275,34 +1250,28 @@ const HTML_CONTENT = `
 
         /* 移动端搜索容器样式 */
         .search-container {
-            margin-top: 8px; /* 减小上边距 */
+            margin-top: 15px; /* 增加上边距，与右上角按钮拉开距离 */
         }
 
         .search-bar {
             flex-wrap: nowrap;
-            max-width: 320px; /* 稍微增加搜索栏宽度 */
-            width: 92%; /* 增加相对宽度 */
-            margin: 4px auto 6px auto; /* 减小上下边距 */
+            max-width: 320px; /* 限制移动端搜索栏宽度 */
+            width: 90%; /* 相对宽度 */
+            margin: 6px auto 8px auto; /* 居中显示 */
         }
 
         .search-bar select {
-            width: 90px; /* 增加选择框宽度以改善对称性 */
-            flex: 0 0 90px;
+            width: 80px; /* 缩小选择框宽度，参考佬友修改版 */
+            flex: 0 0 auto;
             font-size: 12px; /* 减小字体以适应更小宽度 */
-            padding: 8px 10px; /* 调整内边距 */
         }
 
         .search-bar input {
             flex: 1;
-            min-width: 0; /* 确保输入框可以正确收缩 */
-            padding: 8px 10px; /* 统一内边距 */
-            font-size: 13px; /* 稍微增加字体大小 */
         }
 
         .search-bar button {
-            flex: 0 0 50px; /* 固定按钮宽度 */
-            padding: 8px 12px; /* 调整内边距 */
-            font-size: 16px; /* 增加图标大小 */
+            flex: 0 0 auto;
         }
 
         .admin-controls input,
@@ -1322,24 +1291,24 @@ const HTML_CONTENT = `
 
         .card-container {
             display: grid;
-            grid-template-columns: repeat(2, minmax(120px, 1fr)); /* 减小卡片宽度 */
-            column-gap: 10px; /* 减小列间距 */
-            row-gap: 8px; /* 减小行间距 */
+            grid-template-columns: repeat(2, minmax(140px, 1fr));
+            column-gap: 20px;
+            row-gap: 10px;
             justify-content: center;
-            padding: 8px; /* 减小内边距 */
+            padding: 12px;
             margin: 0 auto;
         }
 
         .card {
             width: auto;
             max-width: 100%;
-            padding: 8px; /* 减小内边距 */
+            padding: 12px;
             margin: 0;
-            border-radius: 6px; /* 减小圆角 */
+            border-radius: 8px;
         }
 
         .card-title {
-            font-size: 12px; /* 减小字体 */
+            font-size: 13px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -1347,7 +1316,7 @@ const HTML_CONTENT = `
         }
 
         .card-url {
-            font-size: 10px; /* 减小字体 */
+            font-size: 11px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -1356,11 +1325,11 @@ const HTML_CONTENT = `
 
         .add-remove-controls {
             right: 5px;
-            bottom: 100px; /* 减小底部距离 */
+            bottom: 150px;
             top: auto;
             transform: none;
             flex-direction: column;
-            gap: 10px; /* 减小间距 */
+            gap: 15px;
         }
 
         .round-btn {
@@ -1368,20 +1337,20 @@ const HTML_CONTENT = `
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 32px; /* 减小尺寸 */
-            height: 32px; /* 减小尺寸 */
-            font-size: 18px; /* 减小字体 */
+            width: 36px;
+            height: 36px;
+            font-size: 20px;
         }
 
         .floating-button-group {
-            bottom: 15px;
-            right: 8px;
+            bottom: 20px;
+            right: 10px;
         }
 
         .floating-button-group button {
-            width: 32px;
-            height: 32px;
-            font-size: 16px;
+            width: 36px;
+            height: 36px;
+            font-size: 18px;
         }
 
         #dialog-box {
@@ -1390,12 +1359,9 @@ const HTML_CONTENT = `
             padding: 20px;
         }
 
-        .section-title-container {
-            display: none; /* 移动端隐藏分类标题 */
-        }
-        
-        .section {
-            margin-bottom: 15px; /* 减小分类间距 */
+        .section-title {
+            font-size: 20px;
+            min-width: 100px;
         }
     }
 
@@ -1824,20 +1790,23 @@ const HTML_CONTENT = `
     </style>
 </head>
 
-<body class="dark-theme">
+<body>
     <div class="fixed-elements">
-        <h3>天下有雪-我的个人导航</h3>
+        <h3>我的导航</h3>
         <div class="center-content">
             <!-- 一言模块 -->
             <p id="hitokoto">
-                <span id="hitokoto_text">正在加载一言...</span>
+                <a href="#" id="hitokoto_text"></a>
             </p>
+            <script src="https://v1.hitokoto.cn/?encode=js&select=%23hitokoto" defer></script>
             <!-- 搜索栏 -->
             <div class="search-container">
                 <div class="search-bar">
                     <select id="search-engine-select">
-                        <option value="google">谷歌</option>
+                        <option value="baidu">百度</option>
                         <option value="bing">必应</option>
+                        <option value="google">谷歌</option>
+                        <option value="duckduckgo">DuckDuckGo</option>
                     </select>
                     <input type="text" id="search-input" placeholder="">
                     <button id="search-button">🔍</button>
@@ -1845,7 +1814,27 @@ const HTML_CONTENT = `
             </div>
             <div id="category-buttons-container" class="category-buttons-container"></div>
         </div>
-        <!-- 右上角控制区域已移动到底部 -->
+        <!-- 右上角控制区域 -->
+        <div class="top-right-controls">
+            <button class="admin-btn" id="admin-btn" onclick="toggleAdminMode()" style="display: none;">设置</button>
+            <button class="login-btn" id="login-btn" onclick="handleLoginClick()">登录</button>
+            <button class="github-btn has-tooltip tooltip-bottom tooltip-green" onclick="openGitHub()" data-tooltip="喜欢请点个star">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                </svg>
+            </button>
+            <div class="bookmark-search-toggle" onclick="toggleBookmarkSearch()">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                    <line x1="11" y1="8" x2="11" y2="14"></line>
+                    <line x1="8" y1="11" x2="14" y2="11"></line>
+                </svg>
+                <div class="bookmark-search-dropdown" id="bookmark-search-dropdown">
+                    <input type="text" id="bookmark-search-input" placeholder="搜索书签...">
+                </div>
+            </div>
+        </div>
     </div>
     <div class="content">
         <!-- 管理控制按钮 -->
@@ -1973,54 +1962,28 @@ const HTML_CONTENT = `
     <div id="custom-tooltip"></div>
 
     <script>
-    // 加载一言
-    async function loadHitokoto() {
-        try {
-            const response = await fetch('https://v1.hitokoto.cn/?encode=text');
-            const text = await response.text();
-            const hitokotoElement = document.getElementById('hitokoto_text');
-            if (hitokotoElement) {
-                hitokotoElement.textContent = text;
-            }
-        } catch (error) {
-            console.error('加载一言失败:', error);
-            const hitokotoElement = document.getElementById('hitokoto_text');
-            if (hitokotoElement) {
-                hitokotoElement.textContent = '加载失败';
-            }
-        }
-    }
-
-    // 页面加载时获取一言
-    loadHitokoto();
-
     // 搜索引擎配置
     const searchEngines = {
+        baidu: "https://www.baidu.com/s?wd=",
+        bing: "https://www.bing.com/search?q=",
         google: "https://www.google.com/search?q=",
-        bing: "https://www.bing.com/search?q="
+        duckduckgo: "https://duckduckgo.com/?q="
     };
 
-    let currentEngine = "google";
-    let isShowingSearchResults = false;
+    let currentEngine = "baidu";
 
-    // 设置当前搜索模式
+    // 日志记录函数
+    function logAction(action, details) {
+        const timestamp = new Date().toISOString();
+        const logEntry = timestamp + ': ' + action + ' - ' + JSON.stringify(details);
+        console.log(logEntry);
+    }
+
+    // 设置当前搜索引擎
     function setActiveEngine(engine) {
-        const previousMode = currentEngine;
         currentEngine = engine;
-        document.getElementById("search-engine-select").value = engine;
-        updateSearchPlaceholder();
-
-        if (isInSiteSearchMode()) {
-            const currentValue = document.getElementById('search-input').value;
-            if (currentValue.trim() === '') {
-                hideSearchResults();
-            } else {
-                filterBookmarksByKeyword(currentValue);
-            }
-        } else if (previousMode === 'in_site' && isShowingSearchResults) {
-            hideSearchResults();
-        }
-
+        document.getElementById('search-engine-select').value = engine;
+        logAction('设置搜索引擎', { engine });
     }
 
     // 搜索引擎选择框变更事件
@@ -2028,58 +1991,19 @@ const HTML_CONTENT = `
         setActiveEngine(this.value);
     });
 
-    function isInSiteSearchMode() {
-        return currentEngine === 'in_site';
-    }
-
-    function updateSearchPlaceholder() {
-        const searchInput = document.getElementById('search-input');
-        if (!searchInput) {
-            return;
-        }
-        searchInput.placeholder = isInSiteSearchMode() ? '搜索书签...' : '';
-    }
-
     // 搜索按钮点击事件
     document.getElementById('search-button').addEventListener('click', () => {
         const query = document.getElementById('search-input').value;
-
-        if (isInSiteSearchMode()) {
-            filterBookmarksByKeyword(query);
-            return;
+        if (query) {
+            logAction('执行搜索', { engine: currentEngine, query });
+            window.open(searchEngines[currentEngine] + encodeURIComponent(query), '_blank');
         }
-
-        if (!query) {
-            return;
-        }
-
-        const engineUrl = searchEngines[currentEngine];
-        if (!engineUrl) {
-            console.warn('未配置的搜索引擎:', currentEngine);
-            return;
-        }
-
-        window.open(engineUrl + encodeURIComponent(query), '_blank');
     });
 
     // 搜索输入框回车事件
     document.getElementById('search-input').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             document.getElementById('search-button').click();
-        }
-    });
-
-    // 搜索输入框实时响应站内搜索
-    document.getElementById('search-input').addEventListener('input', (e) => {
-        if (!isInSiteSearchMode()) {
-            return;
-        }
-
-        const value = e.target.value;
-        if (value.trim() === '') {
-            hideSearchResults();
-        } else {
-            filterBookmarksByKeyword(value);
         }
     });
 
@@ -2094,7 +2018,7 @@ const HTML_CONTENT = `
     let removeMode = false;
     let isRemoveCategoryMode = false;
     let isEditCategoryMode = false;
-    let isDarkTheme = true;
+    let isDarkTheme = false;
     let links = [];
     const categories = {};
 
@@ -2109,8 +2033,10 @@ const HTML_CONTENT = `
             updateCategorySelect();
             renderSections();
             saveLinks();
+            logAction('添加分类', { categoryName, currentLinkCount: links.length });
         } else if (categories[categoryName]) {
             await customAlert('该分类已存在', '添加分类');
+            logAction('添加分类失败', { categoryName, reason: '分类已存在' });
         }
     }
 
@@ -2131,6 +2057,7 @@ const HTML_CONTENT = `
             renderSections();
             renderCategoryButtons();
             saveLinks();
+            logAction('删除分类', { category });
         }
     }
 
@@ -2169,6 +2096,7 @@ const HTML_CONTENT = `
         updateCategorySelect();
         saveLinks();
 
+        logAction('编辑分类名称', { oldName, newName });
     }
 
     // 移动分类
@@ -2200,6 +2128,7 @@ const HTML_CONTENT = `
         updateCategorySelect();
         saveLinks();
 
+        logAction('移动分类', { categoryName, direction });
     }
 
     // 切换分类编辑模式
@@ -2239,96 +2168,11 @@ const HTML_CONTENT = `
             console.log('分类编辑模式已关闭');
         }
 
+        logAction('切换分类编辑模式', { isEditCategoryMode });
     }
 
 
 
-    // 加载特定分类的卡片
-    function loadCategoryCards(category) {
-        // 如果已经是当前激活分类，则收缩该分类
-        if (activeCategory === category) {
-            // 收缩当前分类
-            const currentSection = document.querySelector('.section[data-category="' + category + '"]');
-            if (currentSection) {
-                currentSection.style.display = 'none';
-            }
-            
-            // 重置激活分类
-            activeCategory = null;
-            
-            // 更新分类按钮的激活状态
-            updateActiveCategoryButton(null);
-            
-            return;
-        }
-        
-        // 如果是管理员模式，显示所有分类
-        if (!isAdmin) {
-            // 隐藏所有分类区域
-            document.querySelectorAll('.section').forEach(section => {
-                section.style.display = 'none';
-            });
-            
-            // 显示当前选中的分类区域
-            const currentSection = document.querySelector('.section[data-category="' + category + '"]');
-            if (currentSection) {
-                currentSection.style.display = 'block';
-            }
-        } else {
-            // 管理员模式下显示所有分类
-            document.querySelectorAll('.section').forEach(section => {
-                section.style.display = 'block';
-            });
-        }
-        
-        const cardContainer = document.getElementById(category);
-        if (!cardContainer) return;
-        
-        // 检查是否已经加载过
-        if (cardContainer.getAttribute('data-loaded') === 'true') {
-            // 已加载，只需要滚动到该分类
-            scrollToCategory(category);
-            activeCategory = category;
-            updateActiveCategoryButton(category);
-            return;
-        }
-        
-        // 清空容器
-        cardContainer.innerHTML = '';
-        
-        // 加载该分类的卡片
-        links.forEach(link => {
-            if (link.category === category) {
-                createCard(link, cardContainer);
-            }
-        });
-        
-        // 标记为已加载
-        cardContainer.setAttribute('data-loaded', 'true');
-        
-        // 滚动到该分类
-        scrollToCategory(category);
-        
-        // 更新当前激活分类
-        activeCategory = category;
-        
-        // 更新分类按钮的激活状态
-        updateActiveCategoryButton(category);
-        
-    }
-    
-    // 更新分类按钮的激活状态
-    function updateActiveCategoryButton(activeCategory) {
-        document.querySelectorAll('.category-button').forEach(button => {
-            // 如果activeCategory为null或者不匹配，移除激活状态
-            if (activeCategory && button.textContent === activeCategory) {
-                button.classList.add('active');
-            } else {
-                button.classList.remove('active');
-            }
-        });
-    }
-    
     // 渲染分类快捷按钮
     function renderCategoryButtons() {
         // 如果正在显示搜索结果，不重新渲染分类按钮
@@ -2341,12 +2185,15 @@ const HTML_CONTENT = `
 
         // 只有当有分类时才显示按钮容器
         if (Object.keys(categories).length > 0) {
-            // 直接使用categories对象中的所有分类
-            const allCategories = Object.keys(categories);
+            // 获取页面上实际显示的分类顺序（只从sections-container中获取，不包括搜索结果）
+            const displayedCategories = [];
+            document.querySelectorAll('#sections-container .section-title').forEach(titleElement => {
+                displayedCategories.push(titleElement.textContent);
+            });
 
             // 创建按钮并添加到容器
             let visibleButtonsCount = 0;
-            allCategories.forEach(category => {
+            displayedCategories.forEach(category => {
                 // 检查该分类是否有可见的链接
                 const visibleLinks = links.filter(function(link) {
                     return link.category === category && (!link.isPrivate || isLoggedIn);
@@ -2363,11 +2210,16 @@ const HTML_CONTENT = `
                         if (isShowingSearchResults) {
                             hideSearchResults();
                         }
-                        
-                        // 加载对应分类的卡片
-                        loadCategoryCards(category);
+
+                        // 清除所有按钮的active类
+                        document.querySelectorAll('.category-button').forEach(btn => {
+                            btn.classList.remove('active');
+                        });
+                        // 为当前点击的按钮添加active类
+                        button.classList.add('active');
+                        scrollToCategory(category);
                     };
-                    
+
                     buttonsContainer.appendChild(button);
                     visibleButtonsCount++;
                 }
@@ -2479,6 +2331,7 @@ const HTML_CONTENT = `
                 behavior: 'smooth'
             });
 
+            logAction('滚动到分类', { category });
         }
     }
 
@@ -2505,6 +2358,7 @@ const HTML_CONTENT = `
                 throw new Error("HTTP error! status: " + response.status);
             }
 
+
             const data = await response.json();
             console.log('Received data:', data);
 
@@ -2514,11 +2368,21 @@ const HTML_CONTENT = `
 
             publicLinks = data.links ? data.links.filter(link => !link.isPrivate) : [];
             privateLinks = data.links ? data.links.filter(link => link.isPrivate) : [];
-            
-            // 更新全局 links 变量
             links = isLoggedIn ? [...publicLinks, ...privateLinks] : publicLinks;
+
+            renderSections();
+            updateCategorySelect();
+            updateUIState();
+            logAction('读取链接', {
+                publicCount: publicLinks.length,
+                privateCount: privateLinks.length,
+                isLoggedIn: isLoggedIn,
+                hasToken: !!localStorage.getItem('authToken')
+            });
         } catch (error) {
-            console.error('加载链接失败:', error);
+            // 🔧 安全修复：避免泄露详细错误信息
+            console.error('Failed to load links');
+            console.error('加载链接时出错，请刷新页面重试');
         }
     }
 
@@ -2529,30 +2393,14 @@ const HTML_CONTENT = `
 
         if (isAdmin) {
             addRemoveControls.style.display = 'flex';
-            
-            // 管理员模式下显示所有分类
-            document.querySelectorAll('.section').forEach(section => {
-                section.style.display = 'block';
-            });
         } else {
             addRemoveControls.style.display = 'none';
-            
-            // 非管理员模式下，如果有激活分类，只显示该分类
-            if (activeCategory && !isShowingSearchResults) {
-                document.querySelectorAll('.section').forEach(section => {
-                    section.style.display = 'none';
-                });
-                
-                const activeSection = document.querySelector('.section[data-category="' + activeCategory + '"]');
-                if (activeSection) {
-                    activeSection.style.display = 'block';
-                }
-            }
         }
 
         // 同时更新登录和设置按钮状态
         updateLoginButton();
 
+        logAction('更新UI状态', { isAdmin, isLoggedIn });
     }
 
     // 登录状态显示（加载所有链接）
@@ -2564,12 +2412,10 @@ const HTML_CONTENT = `
             document.querySelectorAll('.private-tag').forEach(tag => {
                 tag.style.display = 'block';
             });
+            logAction('显示私密花园');
         }
     }
 
-    // 当前激活的分类
-    let activeCategory = null;
-    
     // 渲染分类和链接
     function renderSections() {
         const container = document.getElementById('sections-container');
@@ -2578,7 +2424,6 @@ const HTML_CONTENT = `
         Object.keys(categories).forEach(category => {
             const section = document.createElement('div');
             section.className = 'section';
-            section.setAttribute('data-category', category);
 
             const titleContainer = document.createElement('div');
             titleContainer.className = 'section-title-container';
@@ -2622,13 +2467,10 @@ const HTML_CONTENT = `
             const cardContainer = document.createElement('div');
             cardContainer.className = 'card-container';
             cardContainer.id = category;
-            // 初始设置为空，等点击分类时再加载
-            cardContainer.setAttribute('data-loaded', 'false');
 
             section.appendChild(titleContainer);
             section.appendChild(cardContainer);
 
-            // 计算该分类下的链接数量（包括私密链接）
             let privateCount = 0;
             let linkCount = 0;
 
@@ -2636,26 +2478,11 @@ const HTML_CONTENT = `
                 if (link.category === category) {
                     if (link.isPrivate) privateCount++;
                     linkCount++;
+                    createCard(link, cardContainer);
                 }
             });
 
-            // 添加链接数量指示器
-            const linkCountIndicator = document.createElement('span');
-            linkCountIndicator.className = 'link-count-indicator';
-            linkCountIndicator.textContent = '(' + linkCount + '个链接)';
-            linkCountIndicator.style.marginLeft = '10px';
-            linkCountIndicator.style.fontSize = '14px';
-            linkCountIndicator.style.color = '#888';
-            titleContainer.appendChild(linkCountIndicator);
-            
-            // 点击分类标题加载对应的卡片
-            titleContainer.style.cursor = 'pointer';
-            titleContainer.addEventListener('click', () => loadCategoryCards(category));
-
-            // 只有当分类中有公开链接或用户已登录时才显示该分类
             if (privateCount < linkCount || isLoggedIn) {
-                // 如果是管理员模式，显示所有分类，否则初始隐藏所有分类区域
-                section.style.display = isAdmin ? 'block' : 'none';
                 container.appendChild(section);
             }
         });
@@ -2663,6 +2490,7 @@ const HTML_CONTENT = `
         // 渲染分类快捷按钮
         renderCategoryButtons();
 
+        logAction('渲染分类和链接', { isAdmin: isAdmin, linkCount: links.length, categoryCount: Object.keys(categories).length });
     }
 
     // 从URL中提取域名
@@ -2693,10 +2521,6 @@ const HTML_CONTENT = `
         card.setAttribute('draggable', isAdmin);
         card.dataset.isPrivate = link.isPrivate;
         card.setAttribute('data-url', link.url);
-        
-        // 每次加载时都从待检测状态开始（紫色），通过 Favicon 加载来更新状态
-        card.classList.add('status-warning');
-        card.style.borderLeftColor = '#9b59b6';  // 紫色 - 待检测
 
         // 设置卡片动画延迟
         const cardIndex = container.children.length;
@@ -2716,70 +2540,23 @@ const HTML_CONTENT = `
         icon.className = 'card-icon';
 
         // 使用自定义图标或回退到favicon提取服务
-        const isUsingFavicon = (
+        icon.src = (
             !link.icon ||
             typeof link.icon !== 'string' ||
             !link.icon.trim() ||
             !isValidUrl(link.icon)
-        );
-        
-        const domain = extractDomain(link.url);
-        
-        // 使用 faviconextractor.com 的 Favicon 服务
-        icon.src = isUsingFavicon
-            ? 'https://www.faviconextractor.com/favicon/' + domain
+        )
+            ? 'https://www.faviconextractor.com/favicon/' + extractDomain(link.url)
             : link.icon;
 
         icon.alt = 'Website Icon';
 
-        // Favicon加载成功 - 标记为正常
-        icon.onload = function() {
-            if (isUsingFavicon) {
-                // Favicon 成功加载就认为网站正常
-                // （faviconextractor.com 如果网站无法访问会返回占位SVG，但也会成功加载）
-                // 因此需要检测是否是占位图
-                
-                // 等待图片完全加载后检查尺寸和内容
-                setTimeout(() => {
-                    // 检查图片的实际尺寸
-                    const width = this.naturalWidth;
-                    const height = this.naturalHeight;
-                    
-                    // faviconextractor 的占位SVG通常是 100x100
-                    // 真实 favicon 通常是 16x16, 32x32, 64x64 等
-                    if (width === 100 && height === 100) {
-                        // 很可能是占位图，标记为异常
-                        link.status = 'error';
-                        link.lastChecked = new Date().toISOString();
-                        card.classList.remove('status-warning', 'status-ok');
-                        card.classList.add('status-error');
-                        card.style.borderLeftColor = '#e74c3c'; // 红色
-                    } else {
-                        // 正常的 Favicon，标记为正常
-                        link.status = 'ok';
-                        link.lastChecked = new Date().toISOString();
-                        card.classList.remove('status-warning', 'status-error');
-                        card.classList.add('status-ok');
-                        card.style.borderLeftColor = '#43b883'; // 绿色
-                    }
-                }, 100);
-            }
-        };
-
-        // Favicon加载失败 - 标记为异常
+        // 如果图片加载失败，使用默认的 SVG 图标
         icon.onerror = function() {
-            if (isUsingFavicon) {
-                link.status = 'error';
-                link.lastChecked = new Date().toISOString();
-                card.classList.remove('status-warning', 'status-ok');
-                card.classList.add('status-error');
-                card.style.borderLeftColor = '#e74c3c'; // 红色
-            }
-            
-            // 使用默认的 SVG 图标
             const svgBlob = new Blob([defaultIconSVG], {type: 'image/svg+xml'});
             const svgUrl = URL.createObjectURL(svgBlob);
             this.src = svgUrl;
+
             this.onload = () => URL.revokeObjectURL(svgUrl);
         };
 
@@ -2797,24 +2574,19 @@ const HTML_CONTENT = `
         card.appendChild(cardTop);
         card.appendChild(url);
 
-        // 添加私密标签
         if (link.isPrivate) {
             const privateTag = document.createElement('div');
             privateTag.className = 'private-tag';
             privateTag.textContent = '私密';
             card.appendChild(privateTag);
         }
-        
-        // 不显示状态标签，只通过边框颜色区分状态
-        // 绿色边框 = 正常
-        // 红色边框 = 异常
-        // 紫色边框 = 警告
 
         const correctedUrl = link.url.startsWith('http://') || link.url.startsWith('https://') ? link.url : 'http://' + link.url;
 
         if (!isAdmin) {
             card.addEventListener('click', () => {
                 window.open(correctedUrl, '_blank');
+                logAction('打开链接', { name: link.name, url: correctedUrl });
             });
         }
 
@@ -2889,6 +2661,7 @@ const HTML_CONTENT = `
             categorySelect.appendChild(option);
         });
 
+        logAction('更新分类选择', { categoryCount: Object.keys(categories).length });
     }
 
     // 保存链接数据
@@ -2898,20 +2671,9 @@ const HTML_CONTENT = `
         }
 
         let allLinks = [...publicLinks, ...privateLinks];
-        
-        // 保留链接的实际状态，不强制修改
-        // 如果链接没有状态信息，设置为默认值
-        allLinks.forEach(link => {
-            if (!link.status) {
-                link.status = 'ok'; // 仅为没有状态的链接设置默认值
-            }
-            if (!link.lastChecked) {
-                link.lastChecked = new Date().toISOString();
-            }
-        });
 
         try {
-            const response = await fetch('/api/saveOrder', {
+            await fetch('/api/saveOrder', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -2923,20 +2685,11 @@ const HTML_CONTENT = `
                     categories: categories
                 }),
             });
-            
-            if (!response.ok) {
-                throw new Error('服务器响应错误: ' + response.status);
-            }
-            
-            const result = await response.json();
-            if (!result.success) {
-                throw new Error('保存失败: ' + (result.message || '未知错误'));
-            }
-            
-            console.log('保存链接成功，包含状态信息');
+            logAction('保存链接', { linkCount: allLinks.length, categoryCount: Object.keys(categories).length });
         } catch (error) {
-            console.error('保存链接失败，请重试:', error);
-            showToast('保存链接失败: ' + (error.message || '请重试'));
+            // 🔧 安全修复：避免泄露详细错误信息
+            logAction('保存链接失败', { error: 'Save operation failed' });
+            console.error('保存链接失败，请重试');
         }
     }
 
@@ -3013,6 +2766,7 @@ const HTML_CONTENT = `
         document.getElementById('private-checkbox').checked = false;
         hideAddDialog();
 
+        logAction('添加卡片', { name, url, tips, icon, category, isPrivate });
     }
 
     // 删除卡片
@@ -3044,6 +2798,7 @@ const HTML_CONTENT = `
 
         saveLinks();
 
+        logAction('删除卡片', { name, url, isPrivate });
     }
 
     // 拖拽卡片
@@ -3130,6 +2885,7 @@ const HTML_CONTENT = `
 
         draggedCard.classList.add('dragging');
         event.dataTransfer.effectAllowed = "move";
+        logAction('开始拖拽卡片', { name: draggedCard.querySelector('.card-title').textContent });
     }
 
     function dragOver(event) {
@@ -3192,6 +2948,7 @@ const HTML_CONTENT = `
     function dragEnd(event) {
         if (draggedCard) {
             draggedCard.classList.remove('dragging');
+            logAction('拖拽卡片结束');
         }
     }
 
@@ -3282,7 +3039,9 @@ const HTML_CONTENT = `
             if (!result.success) {
                 throw new Error('Failed to save order');
             }
+            logAction('保存卡片顺序', { publicCount: newPublicLinks.length, privateCount: newPrivateLinks.length, categoryCount: Object.keys(newCategories).length });
         } catch (error) {
+            logAction('保存顺序失败', { error: error.message });
             await customAlert('保存顺序失败，请重试', '保存失败');
         }
     }
@@ -3293,6 +3052,7 @@ const HTML_CONTENT = `
             container.innerHTML = '';
         });
         await loadLinks();
+        logAction('重新加载卡片（管理员模式）');
     }
 
     // 处理登录按钮点击
@@ -3339,8 +3099,10 @@ const HTML_CONTENT = `
                 hideLoginModal();
                 updateLoginButton();
                 await customAlert('登录成功！', '登录');
+                logAction('登录成功');
             } else {
                 await customAlert('密码错误', '登录失败');
+                logAction('登录失败', { reason: result.error || '密码错误' });
             }
         } catch (error) {
             // 🔧 安全修复：避免泄露详细错误信息
@@ -3359,9 +3121,8 @@ const HTML_CONTENT = `
         updateLoginButton();
         await customAlert('退出登录成功！', '退出登录');
         updateUIState();
+        logAction('退出登录');
     }
-
-    // 日志功能已删除
 
     // 更新按钮状态
     function updateLoginButton() {
@@ -3385,7 +3146,31 @@ const HTML_CONTENT = `
     // 打开GitHub仓库
     function openGitHub() {
         window.open('https://github.com/hmhm2022/Card-Tab', '_blank');
+        logAction('访问GitHub仓库');
     }
+
+    // 切换书签搜索下拉框
+    function toggleBookmarkSearch() {
+        const dropdown = document.getElementById('bookmark-search-dropdown');
+        const isVisible = dropdown.classList.contains('show');
+
+        if (isVisible) {
+            dropdown.classList.remove('show');
+        } else {
+            dropdown.classList.add('show');
+            document.getElementById('bookmark-search-input').focus();
+        }
+    }
+
+    // 点击页面其他地方关闭书签搜索下拉框
+    document.addEventListener('click', function(event) {
+        const searchToggle = document.querySelector('.bookmark-search-toggle');
+        const dropdown = document.getElementById('bookmark-search-dropdown');
+
+        if (!searchToggle.contains(event.target)) {
+            dropdown.classList.remove('show');
+        }
+    });
 
     // 登录密码输入框回车事件
     document.getElementById('login-password').addEventListener('keypress', (e) => {
@@ -3421,11 +3206,13 @@ const HTML_CONTENT = `
                 });
                 const result = await response.json();
                 if (result.success) {
+                    logAction('数据备份成功');
                 } else {
                     throw new Error('备份失败');
                 }
             } catch (error) {
                 // 🔧 安全修复：避免泄露详细错误信息
+                logAction('数据备份失败', { error: 'Backup operation failed' });
                 hideLoading();
                 const confirmed = await customConfirm('备份失败，是否仍要继续进入设置模式？', '是', '否');
                 if (!confirmed) {
@@ -3438,6 +3225,7 @@ const HTML_CONTENT = `
                 isAdmin = true;
                 addRemoveControls.style.display = 'flex';
                 await reloadCardsAsAdmin();
+                logAction('进入设置');
                 hideLoading();
                 await customAlert('准备设置分类和书签', '设置模式');
             } finally {
@@ -3457,6 +3245,7 @@ const HTML_CONTENT = `
 
             addRemoveControls.style.display = 'none';
             await reloadCardsAsAdmin();
+            logAction('离开设置');
             await customAlert('设置已保存', '设置完成');
         }
 
@@ -3470,6 +3259,7 @@ const HTML_CONTENT = `
     function applyDarkTheme() {
         document.body.classList.add('dark-theme');
         isDarkTheme = true;
+        logAction('应用暗色主题');
     }
 
     // 全局变量用于管理对话框事件处理器
@@ -3516,6 +3306,7 @@ const HTML_CONTENT = `
         confirmBtn.addEventListener('click', currentConfirmHandler);
         cancelBtn.addEventListener('click', currentCancelHandler);
 
+        logAction('显示编辑链接对话框');
     }
 
     // 显示添加链接对话框
@@ -3562,6 +3353,7 @@ const HTML_CONTENT = `
             nameInput.focus();
         }, 50);
 
+        logAction('显示添加链接对话框');
     }
 
     // 更新链接
@@ -3625,7 +3417,9 @@ const HTML_CONTENT = `
             renderSections();
             hideAddDialog();
 
+            logAction('更新卡片', { oldUrl: oldLink.url, name, url, tips, icon, category, isPrivate });
         } catch (error) {
+            logAction('更新卡片失败:', error);
             await customAlert('更新卡片失败:' + error.message, '编辑卡片');
         }
     }
@@ -3650,6 +3444,7 @@ const HTML_CONTENT = `
         confirmBtn.onclick = null;
         cancelBtn.onclick = null;
 
+        logAction('隐藏添加链接对话框');
     }
 
     // 切换编辑卡片模式
@@ -3678,6 +3473,7 @@ const HTML_CONTENT = `
             }
         });
 
+        logAction('切换编辑卡片模式', { removeMode });
     }
 
 
@@ -3693,6 +3489,7 @@ const HTML_CONTENT = `
             document.body.classList.remove('dark-theme');
         }
 
+        logAction('切换主题', { isDarkTheme });
     }
 
     // 返回顶部
@@ -3701,6 +3498,7 @@ const HTML_CONTENT = `
             top: 0,
             behavior: 'smooth'
         });
+        logAction('返回顶部');
     }
 
     // 控制返回顶部按钮显示/隐藏
@@ -3770,29 +3568,24 @@ const HTML_CONTENT = `
         return result;
     }
 
-    // 站内书签过滤
-    function filterBookmarksByKeyword(keyword) {
-        const keywordString = (keyword || '').trim();
+    // 全局变量，标记是否正在显示搜索结果
+    let isShowingSearchResults = false;
 
-        if (keywordString === '') {
+    // 书签搜索功能 - 简化版
+    function searchBookmarks(query) {
+        if (!query || query.trim() === '') {
             hideSearchResults();
             return;
         }
 
-        const normalizedKeyword = keywordString.toLowerCase();
+        query = query.toLowerCase().trim();
         const sectionsContainer = document.getElementById('sections-container');
 
+        // 只搜索书签名称，简化搜索逻辑
         const visibleLinks = links;
-        const matchedLinks = visibleLinks.filter(link => {
-            const name = (link.name || '').toLowerCase();
-            const tips = (link.tips || '').toLowerCase();
-            const url = (link.url || '').toLowerCase();
-            return (
-                name.includes(normalizedKeyword) ||
-                tips.includes(normalizedKeyword) ||
-                url.includes(normalizedKeyword)
-            );
-        });
+        const matchedLinks = visibleLinks.filter(link =>
+            link.name.toLowerCase().includes(query)
+        );
 
         // 清空主内容区域
         sectionsContainer.innerHTML = '';
@@ -3847,190 +3640,71 @@ const HTML_CONTENT = `
         if (categoryButtonsContainer) {
             categoryButtonsContainer.style.display = 'none';
         }
-    }
-    
-    // 隐藏搜索结果，返回主界面
-    function hideSearchResults() {
-        const searchResultsSection = document.getElementById('search-results-section');
-        if (searchResultsSection) {
-            searchResultsSection.style.display = 'none';
-        }
 
-        const sectionsContainer = document.getElementById('sections-container');
-        if (sectionsContainer) {
-            sectionsContainer.style.display = 'block';
-        }
-        
+        logAction('执行书签搜索', { query, resultCount: matchedLinks.length });
+    }
+
+    // 隐藏搜索结果 - 简化版
+    function hideSearchResults() {
+        // 重置标记
         isShowingSearchResults = false;
 
-        // 重新渲染分类按钮
+        // 清空搜索框
+        document.getElementById('bookmark-search-input').value = '';
+
+        // 重新渲染正常的分类和书签
+        renderSections();
+
+        // 显示分类按钮
+        const categoryButtonsContainer = document.getElementById('category-buttons-container');
+        if (categoryButtonsContainer) {
+            categoryButtonsContainer.style.display = 'flex';
+        }
+
+        // 重新渲染分类按钮，确保分类按钮的正确显示
         renderCategoryButtons();
-
-        // 如果是管理员模式，显示所有分类
-        if (isAdmin) {
-            document.querySelectorAll('.section').forEach(section => {
-                section.style.display = 'block';
-            });
-            // 如果有激活分类，滚动到该分类
-            if (activeCategory) {
-                scrollToCategory(activeCategory);
-            }
-        } else {
-            // 非管理员模式，隐藏所有分类区域
-            document.querySelectorAll('.section').forEach(section => {
-                section.style.display = 'none';
-            });
-            
-            // 如果有激活分类，加载该分类的卡片
-            if (activeCategory) {
-                // 显示当前激活分类
-                const activeSection = document.querySelector('.section[data-category="' + activeCategory + '"]');
-                if (activeSection) {
-                    activeSection.style.display = 'block';
-                }
-                scrollToCategory(activeCategory);
-            } else {
-                // 如果没有激活分类，自动加载第一个分类
-                // 先隐藏所有分类
-                document.querySelectorAll('.section').forEach(section => {
-                    section.style.display = 'none';
-                });
-                
-                // 加载第一个分类
-                const categoryList = Object.keys(categories || {});
-                if (categoryList.length > 0) {
-                    // 使用loadCategoryCards函数加载第一个分类的卡片
-                    // 这个函数会处理显示分类、加载卡片和设置激活状态
-                    loadCategoryCards(categoryList[0]);
-                } else {
-                    // 如果没有分类，重置激活分类
-                    activeCategory = null;
-                    updateActiveCategoryButton(null);
-                }
-            }
-        }
     }
 
-// 验证密码
-async function verifyPassword(inputPassword) {
-    const response = await fetch('/api/verifyPassword', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: inputPassword }),
+    // 书签搜索输入框回车事件
+    document.getElementById('bookmark-search-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            const query = document.getElementById('bookmark-search-input').value;
+            searchBookmarks(query);
+            // 搜索后关闭下拉框
+            document.getElementById('bookmark-search-dropdown').classList.remove('show');
+        }
     });
-    const result = await response.json();
-    return result;
-}
 
-    // 链接状态检测已集成到卡片加载时的 Favicon 加载中
-    // 通过判断 Favicon 图片尺寸（100x100为占位图）来自动更新状态
-    
-    // 显示提示消息
-    function showToast(message, duration = 3000) {
-        // 检查是否已经有提示框
-        let toast = document.getElementById('toast-message');
-        
-        if (!toast) {
-            // 创建新的提示框
-            toast = document.createElement('div');
-            toast.id = 'toast-message';
-            toast.style.position = 'fixed';
-            toast.style.bottom = '100px';
-            toast.style.left = '50%';
-            toast.style.transform = 'translateX(-50%)';
-            toast.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-            toast.style.color = 'white';
-            toast.style.padding = '10px 20px';
-            toast.style.borderRadius = '5px';
-            toast.style.zIndex = '2000';
-            toast.style.transition = 'opacity 0.3s ease';
-            document.body.appendChild(toast);
+    // 书签搜索输入框实时搜索
+    document.getElementById('bookmark-search-input').addEventListener('input', (e) => {
+        const query = e.target.value;
+        if (query.trim() === '') {
+            hideSearchResults();
+        } else {
+            searchBookmarks(query);
         }
-        
-        // 设置消息并显示
-        toast.textContent = message;
-        toast.style.opacity = '1';
-        
-        // 设置定时器隐藏提示框
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            setTimeout(() => {
-                if (toast.parentNode) {
-                    toast.parentNode.removeChild(toast);
-                }
-            }, 300);
-        }, duration);
-    }
-    
-    // 添加滚动事件监听器
-    window.addEventListener('scroll', handleBackToTopVisibility);
-    
+    });
+
+
+
     // 初始化加载
     document.addEventListener('DOMContentLoaded', async () => {
         try {
             await validateToken();
             updateLoginButton();
             await loadLinks();
-            
-            // 渲染分类和链接
-            renderSections();
-            
-            // 初始加载完成后，如果是管理员模式显示所有分类，否则保持分类收缩
-            setTimeout(() => {
-                if (isAdmin) {
-                    // 管理员模式显示所有分类
-                    document.querySelectorAll('.section').forEach(section => {
-                        section.style.display = 'block';
-                    });
-                } else {
-                    // 非管理员模式下首次加载自动显示第一个分类
-                    // 先隐藏所有分类
-                    document.querySelectorAll('.section').forEach(section => {
-                        section.style.display = 'none';
-                    });
-                    
-                    // 加载第一个分类
-                    const categoryList = Object.keys(categories || {});
-                    if (categoryList.length > 0) {
-                        // 设置激活分类
-                        const firstCategory = categoryList[0];
-                        
-                        // 使用loadCategoryCards函数加载第一个分类的卡片
-                        // 这个函数会处理显示分类、加载卡片和设置激活状态
-                        loadCategoryCards(firstCategory);
-                    } else {
-                        // 如果没有分类，重置激活分类
-                        activeCategory = null;
-                    }
-                }
-                
-                // 无论如何，都要渲染分类按钮
-                renderCategoryButtons();
-                
-                // 确保分类按钮容器是显示的
-                const categoryButtonsContainer = document.getElementById('category-buttons-container');
-                if (categoryButtonsContainer) {
-                    categoryButtonsContainer.style.display = 'flex';
-                }
-                
-                // 更新分类按钮状态
-                updateActiveCategoryButton(activeCategory);
-                
-                // 如果有激活分类，滚动到该分类
-                if (activeCategory) {
-                    scrollToCategory(activeCategory);
-                }
-            }, 500);
-            
+            // 初始加载完成后，检测当前可见分类
+            setTimeout(setActiveCategoryButtonByVisibility, 500);
             // 初始化返回顶部按钮状态
             setTimeout(handleBackToTopVisibility, 100);
-            
-            // 链接状态会在卡片加载时通过 Favicon 自动检测，无需手动调用
         } catch (error) {
             // 🔧 安全修复：避免泄露详细错误信息
             console.error('Initialization failed');
         }
     });
+
+    // 添加滚动事件监听器
+    window.addEventListener('scroll', handleBackToTopVisibility);
 
 
     // 前端检查是否有 token
@@ -4288,35 +3962,7 @@ async function verifyPassword(inputPassword) {
         mask.style.display = 'none';
     }
 
-    // 初始化事件监听器
-    document.addEventListener('DOMContentLoaded', function() {
-        // 绑定登录按钮事件
-        const loginBtn = document.getElementById('login-btn');
-        if (loginBtn) {
-            loginBtn.onclick = handleLoginClick;
-        }
-        
-        // 绑定管理按钮事件
-        const adminBtn = document.getElementById('admin-btn');
-        if (adminBtn) {
-            adminBtn.onclick = toggleAdminMode;
-        }
-        
-    });
-
     </script>
-    
-    <!-- 底部版权信息 -->
-    <div id="copyright">
-        <div class="copyright-container">
-            <span class="site-title">天下有雪-我的个人导航</span>
-            <p>&copy; 2025 <a href="https://github.com/qilan28/Card-Tab" target="_blank">Card-Tab</a></p>
-            <div class="buttons-group">
-                <button class="admin-btn" id="admin-btn" style="display: none;">设置</button>
-                <button class="login-btn" id="login-btn">登录</button>
-            </div>
-        </div>
-    </div>
 </body>
 
 </html>
@@ -4347,7 +3993,7 @@ async function validateServerToken(authToken, env) {
         const tokenTimestamp = parseInt(timestamp);
         const now = Date.now();
 
-        const FIFTEEN_MINUTES = 300 * 60 * 1000;
+        const FIFTEEN_MINUTES = 15 * 60 * 1000;
         if (now - tokenTimestamp > FIFTEEN_MINUTES) {
             return {
                 isValid: false,
@@ -4408,22 +4054,7 @@ async function validateAdminToken(authToken, env) {
     };
 }
 
-
-
-// 日志功能已完全删除
-
 export default {
-    // 定时触发处理函数已禁用（链接状态检测改为浏览器端进行）
-    async scheduled(event, env, ctx) {
-        console.log('定时任务已禁用，链接状态检测改为浏览器端进行');
-        return new Response(JSON.stringify({ 
-            success: true, 
-            message: '定时任务已禁用，链接状态检测改为浏览器端进行'
-        }), {
-            headers: { 'Content-Type': 'application/json' }
-        });
-    },
-    
     async fetch(request, env) {
       const url = new URL(request.url);
 
@@ -4432,8 +4063,6 @@ export default {
           headers: { 'Content-Type': 'text/html' }
         });
       }
-      
-      // 链接状态检查已集成到 /api/getLinks 端点
 
       if (url.pathname === '/api/getLinks') {
         const userId = url.searchParams.get('userId');
@@ -4442,16 +4071,7 @@ export default {
 
         if (data) {
             const parsedData = JSON.parse(data);
-            
-            // 服务端不再进行链接状态检测，状态检测改为浏览器端进行
-            // 确保所有链接都有默认状态
-            const allLinks = parsedData.links || [];
-            for (const link of allLinks) {
-                if (!link.status) {
-                    link.status = 'ok'; // 默认为正常状态
-                }
-            }
-            
+
             // 验证 token
             if (authToken) {
                 const validation = await validateServerToken(authToken, env);
@@ -4478,8 +4098,7 @@ export default {
 
             return new Response(JSON.stringify({
                 links: filteredLinks,
-                categories: filteredCategories,
-                lastStatusCheck: parsedData.lastStatusCheck || 0
+                categories: filteredCategories
             }), {
                 status: 200,
                 headers: { 'Content-Type': 'application/json' }
@@ -4506,54 +4125,15 @@ export default {
             });
         }
 
-        try {
-            const { userId, links, categories } = await request.json();
-            
-            // 获取现有数据，保留lastStatusCheck字段
-            const existingData = await env.CARD_ORDER.get(userId);
-            let lastStatusCheck = Date.now();
-            
-            if (existingData) {
-                try {
-                    const parsedData = JSON.parse(existingData);
-                    lastStatusCheck = parsedData.lastStatusCheck || Date.now();
-                } catch (e) {
-                    console.error('解析现有数据失败', e);
-                }
-            }
-            
-            // 确保所有链接都有状态信息
-            for (const link of links) {
-                if (!link.status) {
-                    link.status = 'ok'; // 默认为正常状态
-                    link.lastChecked = new Date().toISOString();
-                }
-            }
-            
-            // 保存数据，包含状态信息和最后检查时间
-            await env.CARD_ORDER.put(userId, JSON.stringify({ 
-                links, 
-                categories, 
-                lastStatusCheck 
-            }));
-            
-            return new Response(JSON.stringify({
-                success: true,
-                message: '保存成功',
-                lastStatusCheck
-            }), {
-                status: 200,
-                headers: { 'Content-Type': 'application/json' }
-            });
-        } catch (error) {
-            return new Response(JSON.stringify({
-                success: false,
-                message: '保存失败: ' + error.message
-            }), {
-                status: 500,
-                headers: { 'Content-Type': 'application/json' }
-            });
-        }
+        const { userId, links, categories } = await request.json();
+        await env.CARD_ORDER.put(userId, JSON.stringify({ links, categories }));
+        return new Response(JSON.stringify({
+            success: true,
+            message: '保存成功'
+        }), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' }
+        });
       }
 
       if (url.pathname === '/api/verifyPassword' && request.method === 'POST') {
@@ -4598,8 +4178,6 @@ export default {
             });
         }
       }
-
-      // /api/refreshLinkStatus 已删除，链接状态检测改为浏览器端进行
 
       if (url.pathname === '/api/backupData' && request.method === 'POST') {
         // 🔧 安全修复：添加管理员权限验证
