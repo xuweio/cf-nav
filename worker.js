@@ -254,11 +254,15 @@ const HTML_CONTENT = `<!DOCTYPE html>
     }
     .search-bar:focus-within{ box-shadow:0 3px 12px rgba(0,0,0,.1);border-color:var(--primary); }
     .search-bar select{
-      border:none;background:#f4f7fa;
-      padding:10px 15px;font-size:14px;
-      color:var(--primary);width:120px;outline:none;
+      border:none;
+      background:var(--bg);
+      padding:10px 15px;
+      font-size:14px;
+      color:var(--primary);
+      width:120px;
+      outline:none;
       appearance:none;
-      background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="6" viewBox="0 0 12 6"><path fill="%233b82f6" d="M0 0l6 6 6-6z"/></svg>');
+      background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="6" viewBox="0 0 12 6"><path fill="currentColor" d="M0 0l6 6 6-6z"/></svg>');
       background-repeat:no-repeat;
       background-position:right 10px center;
       cursor:pointer;transition:all .3s ease;
