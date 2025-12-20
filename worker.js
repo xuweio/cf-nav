@@ -2752,6 +2752,42 @@ document.addEventListener("click", (e) => {
   }
 });
 
+
+/* ===== FREE AI 前端兜底填充 ===== */
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("ai-generate-btn");
+  if(!btn) return;
+
+  btn.addEventListener("click", async () => {
+    const url = document.getElementById("url-input")?.value;
+    if(!url){ alert("请先输入网址"); return; }
+
+    btn.disabled = true;
+    btn.textContent = "AI...";
+
+    try{
+      const res = await fetch("/api/aiGenerate",{
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({ url })
+      });
+      const data = await res.json();
+
+      if(data.name && !document.getElementById("name-input").value){
+        document.getElementById("name-input").value = data.name;
+      }
+      if(data.desc){
+        document.getElementById("tips-input").value = data.desc;
+      }
+    }catch(e){
+      alert("AI 识别失败");
+    }finally{
+      btn.disabled = false;
+      btn.textContent = "AI";
+    }
+  });
+});
+
 </script>
 
 <div class="admin-panel-handle" onclick="openAdminPanel()" title="后台操作"></div>
