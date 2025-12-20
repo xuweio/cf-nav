@@ -4,6 +4,13 @@
 https://deploy.workers.cloudflare.com/?url=https://github.com/djkyc/cf-nav
 )
 
+## * ☁️ Cloudflare 需要加的环境变量（只多 1 个）
+  AI_API_KEY = sk-xxxxxxxx
+
+
+不加也能用（只是不走 OpenAI 兜底）
+
+
 效果图
 <img width="1352" height="606" alt="image" src="https://github.com/user-attachments/assets/e1127beb-1658-4dc6-b91a-f15ab7ebb75f" />
 
