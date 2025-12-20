@@ -3295,7 +3295,41 @@ for (let i = 0; i < links.length; i++) {
       const name = (ogTitle?.[1] || title?.[1] || hostname).replace(/\s+/g," ").trim().slice(0,16);
       const description = (ogDesc?.[1] || desc?.[1] || "常用网站").replace(/\s+/g," ").trim().slice(0,40);
 
+      
+      // OpenAI fallback (optional)
+      if ((description === "官方网站" || description.length < 6) && env.AI_API_KEY) {
+        try{
+          const prompt = `请根据以下网站地址生成：
+网站名称（不超过10字）和一句简介（不超过30字）：
+${targetUrl}
+JSON: {"name":"","desc":""}`;
+
+          const r = await fetch("https://api.openai.com/v1/chat/completions",{
+            method:"POST",
+            headers:{
+              "Content-Type":"application/json",
+              "Authorization":"Bearer "+env.AI_API_KEY
+            },
+            body:JSON.stringify({
+              model:"gpt-4o-mini",
+              messages:[{role:"user",content:prompt}],
+              temperature:0.2
+            })
+          });
+          const j = await r.json();
+          const t = j.choices?.[0]?.message?.content;
+          if(t){
+            const ai = JSON.parse(t);
+            return Response.json({
+              name: ai.name || name,
+              desc: ai.desc || description
+            });
+          }
+        }catch(e){}
+      }
+
       return Response.json({ name, desc: description });
+
     }
 
     return new Response("Not Found", { status: 404 });
