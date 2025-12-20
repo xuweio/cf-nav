@@ -295,8 +295,12 @@ const HTML_CONTENT = `<!DOCTYPE html>
       background:#2a2e38;color:var(--dark-primary);
       box-shadow:0 2px 4px rgba(0,0,0,.2);
     }
+    body.dark-theme .category-button:hover{
+      color:#000 !important;
+    }
     body.dark-theme .category-button:hover,
     body.dark-theme .category-button.active{
+      color:#000 !important;
       background:var(--structure-accent);color:#fff;
       border-bottom-color:var(--dark-primary-hover);
     }
@@ -537,7 +541,8 @@ const HTML_CONTENT = `<!DOCTYPE html>
     #back-to-top-btn{ display:none; }
     body.dark-theme .floating-button-group button{ background:var(--structure-accent); }
     body.dark-theme .floating-button-group button:hover{ background:var(--dark-primary-hover); }
-    #theme-toggle{ font-size:24px;line-height:40px; }
+    #theme-toggle{ font-size:24px;line-height:40px;color:#000; }
+    body.dark-theme #theme-toggle{ color:#fff; }
 
     /* ========= 对话框/弹窗 ========= */
     #dialog-overlay{
