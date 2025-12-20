@@ -800,6 +800,16 @@ const HTML_CONTENT = `<!DOCTYPE html>
     <!-- 管理控制按钮 -->
     <div class="add-remove-controls">
       <div class="admin-panel-title">后台操作</div>
+      <div class="admin-action">
+        <button class="round-btn" onclick="editSiteTitle()" title="修改站点名称">
+          <svg viewBox="0 0 48 48" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 42h36" stroke="white" stroke-width="4"/>
+            <path d="M14 34l20-20 6 6-20 20H14v-6z" stroke="white" stroke-width="4" fill="none"/>
+          </svg>
+        </button>
+        <span class="admin-label">0 修改站点名称</span>
+      </div>
+
 
       <div class="admin-action">
         <button class="round-btn remove-btn" onclick="toggleRemoveMode()" title="编辑链接">
@@ -2529,6 +2539,18 @@ if(isAdmin){
       localStorage.setItem("siteTitle",v);
     }
   };
+}
+
+
+/* ===== 后台：修改站点名称 ===== */
+function editSiteTitle(){
+  const titleEl = document.getElementById("site-title");
+  if(!titleEl) return;
+  const v = prompt("请输入站点名称", titleEl.textContent);
+  if(v){
+    titleEl.textContent = v;
+    localStorage.setItem("siteTitle", v);
+  }
 }
 
 </script>
