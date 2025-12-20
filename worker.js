@@ -472,6 +472,15 @@ const HTML_CONTENT = `<!DOCTYPE html>
       white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
       transition:color .3s ease;
     }
+    .card-desc{
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:4px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
     .card-url{
       font-size:12px;color:var(--muted);
       white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
@@ -764,7 +773,16 @@ const HTML_CONTENT = `<!DOCTYPE html>
       }
       .card{ width:auto;max-width:100%;padding:12px;margin:0;border-radius:8px; }
       .card-title{ font-size:13px;max-width:100%; }
-      .card-url{ font-size:11px;max-width:100%; }
+      .card-desc{
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:4px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .card-url{ font-size:11px;max-width:100%; }
       .add-remove-controls{ right:10px;bottom:120px;top:auto;transform:none;gap:10px;padding:10px;max-height:calc(100vh - 260px); }
       .admin-label{ font-size:12px;max-width:160px;white-space:normal; }
       .admin-panel-title{ font-size:12px; }
@@ -1454,11 +1472,17 @@ const HTML_CONTENT = `<!DOCTYPE html>
       cardTop.appendChild(icon);
       cardTop.appendChild(title);
 
+      const descEl = document.createElement("div");
+      descEl.className = "card-desc";
+      if(link.tips){
+        descEl.textContent = link.tips.length > 28 ? link.tips.slice(0,28)+"…" : link.tips;
+      }
       const urlEl = document.createElement("div");
       urlEl.className = "card-url";
       urlEl.textContent = link.url;
 
       card.appendChild(cardTop);
+      card.appendChild(descEl);
       card.appendChild(urlEl);
 
       if(link.isPrivate){
@@ -2580,6 +2604,25 @@ function editSiteTitle(){
     localStorage.setItem("siteTitle", v);
   }
 }
+
+
+/* ===== 自动抓取网站描述 ===== */
+async function fetchSiteDescription(url){
+  try{
+    const res = await fetch("/api/fetchMeta?url="+encodeURIComponent(url));
+    const data = await res.json();
+    return data.description || "";
+  }catch(e){ return ""; }
+}
+
+document.getElementById("url-input")?.addEventListener("blur", async function(){
+  const url = this.value;
+  if(!url) return;
+  const tipsInput = document.getElementById("tips-input");
+  if(tipsInput && !tipsInput.value){
+    tipsInput.value = await fetchSiteDescription(url);
+  }
+});
 
 </script>
 </body>
