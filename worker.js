@@ -996,7 +996,7 @@ const HTML_CONTENT = `<!DOCTYPE html>
           <path d="M10 10h28" stroke="white" stroke-width="4" stroke-linecap="round"/>
         </svg>
       </button>
-        <span class="admin-label">6.导入数据（覆盖恢复）</span>
+        <span class="admin-label">6 导入数据（覆盖恢复）</span>
       </div>
 
       <input type="file" id="import-file" accept="application/json" style="display:none;" />
@@ -3330,6 +3330,77 @@ JSON: {"name":"","desc":""}`;
 
       return Response.json({ name, desc: description });
 
+    }
+
+    
+    // ===== aiGenerate (OpenAI FIRST, fallback later) =====
+    if (url.pathname === "/api/aiGenerate") {
+      let targetUrl = "";
+      try{
+        const body = await request.json();
+        targetUrl = body.url || "";
+      }catch(e){}
+
+      if (!targetUrl) {
+        return Response.json({ name: "", desc: "" });
+      }
+
+      let hostname = targetUrl;
+      try{ hostname = new URL(targetUrl).hostname; }catch(e){}
+      const simpleName = hostname.replace(/^www\./,"").split(".")[0];
+
+      // --- 1. OpenAI 优先 ---
+      if (env.AI_API_KEY) {
+        try{
+          const prompt = `请根据以下网站地址生成：
+网站名称（<=10字）
+一句话简介（<=30字）
+网址：${targetUrl}
+仅返回 JSON：{"name":"","desc":""}`;
+
+          const r = await fetch("https://api.openai.com/v1/chat/completions",{
+            method:"POST",
+            headers:{
+              "Content-Type":"application/json",
+              "Authorization":"Bearer "+env.AI_API_KEY
+            },
+            body:JSON.stringify({
+              model:"gpt-4o-mini",
+              messages:[{role:"user",content:prompt}],
+              temperature:0.2
+            })
+          });
+
+          const j = await r.json();
+          const t = j.choices?.[0]?.message?.content;
+          if(t){
+            const ai = JSON.parse(t);
+            if(ai?.name || ai?.desc){
+              return Response.json({
+                name: ai.name || simpleName,
+                desc: ai.desc || "官方网站"
+              });
+            }
+          }
+        }catch(e){}
+      }
+
+      // --- 2. 免费兜底 ---
+      let html = "";
+      try{
+        const res = await fetch(targetUrl,{ headers:{ "User-Agent":"Mozilla/5.0" }});
+        html = await res.text();
+      }catch(e){}
+
+      const ogTitle = html.match(/og:title[^>]*content=["']([^"']+)/i);
+      const ogDesc  = html.match(/og:description[^>]*content=["']([^"']+)/i);
+      const title   = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+      const desc    = html.match(/name=["']description["'][^>]*content=["']([^"']+)/i);
+
+      return Response.json({
+        name: (ogTitle?.[1] || title?.[1] || simpleName).slice(0,16),
+        desc: (ogDesc?.[1] || desc?.[1] || "官方网站").slice(0,40)
+      });
     }
 
     return new Response("Not Found", { status: 404 });
