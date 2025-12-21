@@ -1199,14 +1199,6 @@ body.dark-theme .admin-panel-hint{
   background:#fff;
   color:#111;
 }
-
-/* ===== 未登录：后台面板完全隐藏 ===== */
-body:not(.logged-in) .add-remove-controls,
-body:not(.logged-in) .admin-panel-handle,
-body:not(.logged-in) .admin-panel-hint {
-  display: none !important;
-}
-
 </style>
 </head>
 <body>
@@ -1483,22 +1475,6 @@ body:not(.logged-in) .admin-panel-hint {
     setActiveEngine(currentEngine);
 
     /* ================= 全局状态 ================= */
-    /* ===== 登录态 UI 同步（关键修复） ===== */
-    const __savedToken = localStorage.getItem("token");
-    if (__savedToken) {
-      document.body.classList.add("logged-in");
-      isLoggedIn = true;
-      isAdmin = true;
-    }
-
-    function __onLoginUISuccess() {
-      document.body.classList.add("logged-in");
-      isLoggedIn = true;
-      isAdmin = true;
-      const adminBtn = document.getElementById("admin-btn");
-      if (adminBtn) adminBtn.style.display = "inline-block";
-    }
-
     let publicLinks = [];
     let privateLinks = [];
     let isAdmin = false;
