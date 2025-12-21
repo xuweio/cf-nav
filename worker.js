@@ -1,10 +1,30 @@
-// Nav-CF Worker - FINAL STABLE AI VERSION
+// Nav-CF Worker - Single-file Cloudflare Deploy (KV版本)
 // KV Binding: CARD_ORDER
 // Env:
-// - ADMIN_PASSWORD
-// - AI_API_KEY (sk-xxxx placeholder supported)
+// - ADMIN_PASSWORD (必填)
+// - AI_API_KEY (可选，用于 /api/aiGenerate；不填则走 fallback)
 
-import { SEED_DATA, SEED_USER_ID } from "./db.js";
+const SEED_USER_ID = "testUser";
+const SEED_DATA = {
+  links: [],
+  categories: { "常用": [] }
+};
+
+function jsonResponse(data, init = {}) {
+  const headers = new Headers(init.headers || {});
+  if (!headers.has("content-type")) headers.set("content-type", "application/json; charset=UTF-8");
+  return new Response(JSON.stringify(data), { ...init, headers });
+}
+
+function unauthorized(message = "Unauthorized") {
+  return jsonResponse({ error: message }, { status: 401 });
+}
+
+function getAuthStatus(request, env) {
+  const auth = request.headers.get("Authorization");
+  if (!auth) return { hasAuthHeader: false, authed: false };
+  return { hasAuthHeader: true, authed: auth === (env.ADMIN_PASSWORD || "") };
+}
 
 function cleanDomain(hostname) {
   return hostname
@@ -13,28 +33,94 @@ function cleanDomain(hostname) {
     .split(".")[0];
 }
 
+function normalizeData(data) {
+  const d = (data && typeof data === "object") ? data : {};
+  const links = Array.isArray(d.links) ? d.links : [];
+  const categories = (d.categories && typeof d.categories === "object") ? d.categories : {};
+  // Ensure category arrays
+  for (const k of Object.keys(categories)) {
+    if (!Array.isArray(categories[k])) categories[k] = [];
+  }
+  // If categories empty but links exist, rebuild categories from links
+  if (Object.keys(categories).length === 0 && links.length) {
+    for (const link of links) {
+      const c = link.category || "常用";
+      if (!categories[c]) categories[c] = [];
+      categories[c].push(link);
+    }
+  }
+  // Ensure at least one category exists
+  if (Object.keys(categories).length === 0) categories["常用"] = [];
+  return { links, categories };
+}
+
+function filterPublic(data) {
+  const d = normalizeData(data);
+  const publicLinks = d.links.filter(l => !l || !l.isPrivate);
+  const categories = {};
+  for (const [cat, arr] of Object.entries(d.categories)) {
+    categories[cat] = (Array.isArray(arr) ? arr : []).filter(l => !l || !l.isPrivate);
+  }
+  return { links: publicLinks, categories };
+}
+
+async function fetchMetaDescription(targetUrl) {
+  if (!targetUrl) return "";
+  let u;
+  try { u = new URL(targetUrl); } catch { return ""; }
+
+  const res = await fetch(u.toString(), {
+    redirect: "follow",
+    headers: {
+      "User-Agent": "Nav-CF-MetaFetcher/1.0"
+    }
+  });
+
+  const ct = res.headers.get("content-type") || "";
+  if (!ct.includes("text/html")) return "";
+
+  const html = await res.text();
+
+  const pick = (re) => {
+    const m = html.match(re);
+    return m && m[1] ? m[1].trim() : "";
+  };
+
+  // Prefer meta description, then og:description
+  let desc =
+    pick(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["'][^>]*>/i) ||
+    pick(/<meta[^>]+content=["']([^"']+)["'][^>]+name=["']description["'][^>]*>/i) ||
+    pick(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["'][^>]*>/i) ||
+    pick(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:description["'][^>]*>/i);
+
+  if (desc.length > 160) desc = desc.slice(0, 160);
+  return desc;
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    /* ======================================================
-       AI GENERATE — FIRST ROUTE, NO AUTH, OPENAI FIRST (STABLE)
-       ====================================================== */
+    /* ================= PAGE ================= */
+    if (url.pathname === "/" || url.pathname === "/index.html") {
+      return new Response(HTML_CONTENT, {
+        headers: { "content-type": "text/html; charset=UTF-8" }
+      });
+    }
+
+    /* ================= AI GENERATE ================= */
     if (url.pathname === "/api/aiGenerate") {
       let targetUrl = "";
-
       if (request.method === "POST") {
         try {
           const body = await request.json();
           targetUrl = body.url || "";
         } catch {}
-      } else if (request.method === "GET") {
+      } else {
         targetUrl = url.searchParams.get("url") || "";
       }
 
-      if (!targetUrl) {
-        return Response.json({ name: "", desc: "", source: "none" });
-      }
+      if (!targetUrl) return jsonResponse({ name: "", desc: "", source: "none" });
 
       const hostname = (() => {
         try { return new URL(targetUrl).hostname; }
@@ -45,18 +131,9 @@ export default {
       const aiKey = env.AI_API_KEY || "";
       const canUseAI = aiKey.startsWith("sk-") && !aiKey.includes("xxxx");
 
-      /* ---------- OpenAI FIRST (temperature=0 for stability) ---------- */
       if (canUseAI) {
         try {
-          const prompt = `你是一个中文网站导航编辑。
-请根据网址生成导航信息：
-- 名称：完整、自然，不要简称
-- 描述：10~15字，概括主要用途
-
-网址：${targetUrl}
-
-仅返回 JSON：{"name":"","desc":""}`;
-
+          const prompt = `你是一个中文网站导航编辑。\n请根据网址生成导航信息：\n- 名称：完整、自然，不要简称\n- 描述：10~15字，概括主要用途\n\n网址：${targetUrl}\n\n仅返回 JSON：{"name":"","desc":""}`;
           const r = await fetch("https://api.openai.com/v1/chat/completions", {
             method: "POST",
             headers: {
@@ -74,8 +151,8 @@ export default {
           const t = j.choices?.[0]?.message?.content;
           if (t) {
             const ai = JSON.parse(t);
-            if (ai.name || ai.desc) {
-              return Response.json({
+            if (ai && (ai.name || ai.desc)) {
+              return jsonResponse({
                 name: ai.name || domain.charAt(0).toUpperCase() + domain.slice(1),
                 desc: ai.desc || "",
                 source: "openai"
@@ -85,62 +162,117 @@ export default {
         } catch {}
       }
 
-      /* ---------- Worker SMART FALLBACK ---------- */
+      // Fallback
       let fallbackDesc = "官方网站入口";
       if (domain === "uptodown") fallbackDesc = "应用与软件下载平台";
       if (domain === "github") fallbackDesc = "开源代码托管平台";
       if (domain === "cloudflare") fallbackDesc = "网络与安全服务平台";
       if (domain === "google") fallbackDesc = "搜索与互联网服务";
 
-      return Response.json({
+      return jsonResponse({
         name: domain.charAt(0).toUpperCase() + domain.slice(1),
         desc: fallbackDesc,
         source: "fallback"
       });
     }
 
-    /* ================= PAGE ================= */
-    if (url.pathname === "/") {
-      return new Response(HTML_CONTENT, {
-        headers: { "content-type": "text/html; charset=UTF-8" }
-      });
+    /* ================= META (for auto description) ================= */
+    if (url.pathname === "/api/fetchMeta" && request.method === "GET") {
+      const targetUrl = url.searchParams.get("url") || "";
+      try {
+        const description = await fetchMetaDescription(targetUrl);
+        return jsonResponse({ description });
+      } catch {
+        return jsonResponse({ description: "" });
+      }
     }
 
-    /* ================= API ================= */
-    if (url.pathname === "/api/getLinks") {
-      const data = await env.CARD_ORDER.get(SEED_USER_ID, "json") || SEED_DATA;
-      return Response.json(data);
-    }
-
-    
     /* ================= VERIFY PASSWORD ================= */
     if (url.pathname === "/api/verifyPassword" && request.method === "POST") {
       let body = {};
       try { body = await request.json(); } catch {}
       const pwd = body.password || "";
-      if (pwd === env.ADMIN_PASSWORD) {
-        return Response.json({ valid: true, token: env.ADMIN_PASSWORD });
+      if ((env.ADMIN_PASSWORD || "") && pwd === env.ADMIN_PASSWORD) {
+        // 保持与前端现有逻辑兼容：token 直接使用 ADMIN_PASSWORD
+        return jsonResponse({ valid: true, token: env.ADMIN_PASSWORD });
       }
-      return Response.json({ valid: false }, { status: 401 });
+      return jsonResponse({ valid: false }, { status: 401 });
     }
 
-    if (url.pathname === "/api/saveOrder") {
-      let auth = request.headers.get("Authorization");
-let body = {};
-try { body = await request.json(); } catch {}
-if (auth !== env.ADMIN_PASSWORD && body.password !== env.ADMIN_PASSWORD) {
-  return new Response("Unauthorized", { status: 401 });
-}
+    /* ================= GET LINKS ================= */
+    if (url.pathname === "/api/getLinks") {
+      const { hasAuthHeader, authed } = getAuthStatus(request, env);
+      if (hasAuthHeader && !authed) return unauthorized("Invalid token");
 
-      await env.CARD_ORDER.put(SEED_USER_ID, JSON.stringify(body));
-      return Response.json({ ok: true });
+      const userId = url.searchParams.get("userId") || SEED_USER_ID;
+      const raw = await env.CARD_ORDER.get(userId, "json");
+      const data = normalizeData(raw || SEED_DATA);
+
+      // 未登录：只返回公开数据（真正隐藏私密链接，避免被抓包看到）
+      if (!authed) return jsonResponse(filterPublic(data));
+      return jsonResponse(data);
+    }
+
+    /* ================= SAVE ORDER / DATA ================= */
+    if (url.pathname === "/api/saveOrder") {
+      const { hasAuthHeader, authed } = getAuthStatus(request, env);
+      if (!hasAuthHeader || !authed) return unauthorized("Unauthorized");
+
+      let body = {};
+      try { body = await request.json(); } catch {}
+      const userId = body.userId || SEED_USER_ID;
+
+      const dataToSave = normalizeData({
+        links: body.links,
+        categories: body.categories
+      });
+
+      await env.CARD_ORDER.put(userId, JSON.stringify(dataToSave));
+      // 前端期待 success 字段
+      return jsonResponse({ success: true });
+    }
+
+    /* ================= EXPORT ================= */
+    if (url.pathname === "/api/exportData" && request.method === "GET") {
+      const { hasAuthHeader, authed } = getAuthStatus(request, env);
+      if (!hasAuthHeader || !authed) return unauthorized("Unauthorized");
+
+      const userId = url.searchParams.get("userId") || SEED_USER_ID;
+      const raw = await env.CARD_ORDER.get(userId, "json");
+      const data = normalizeData(raw || SEED_DATA);
+
+      return new Response(JSON.stringify(data, null, 2), {
+        headers: {
+          "content-type": "application/json; charset=UTF-8",
+          "content-disposition": 'attachment; filename="cardtab_export.json"'
+        }
+      });
+    }
+
+    /* ================= IMPORT ================= */
+    if (url.pathname === "/api/importData" && request.method === "POST") {
+      const { hasAuthHeader, authed } = getAuthStatus(request, env);
+      if (!hasAuthHeader || !authed) return unauthorized("Unauthorized");
+
+      let body = {};
+      try { body = await request.json(); } catch {}
+      const userId = body.userId || SEED_USER_ID;
+
+      const incoming = (body.data && typeof body.data === "object") ? body.data : null;
+      if (!incoming) {
+        return jsonResponse({ message: "缺少 data 字段" }, { status: 400 });
+      }
+
+      const dataToSave = normalizeData(incoming);
+      await env.CARD_ORDER.put(userId, JSON.stringify(dataToSave));
+      return jsonResponse({ success: true });
     }
 
     return new Response("Not Found", { status: 404 });
   }
 };
 
-/* ================= HTML 内容（仅此一处） ================= */
+
 const HTML_CONTENT = `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -2353,25 +2485,6 @@ const HTML_CONTENT = `<!DOCTYPE html>
 
         showLoading("正在进入设置模式...");
 
-        // 进入设置模式前自动备份（可选）
-        try{
-          const response = await fetch("/api/backupData", {
-            method:"POST",
-            headers:{
-              "Content-Type":"application/json",
-              "Authorization": localStorage.getItem("authToken")
-            },
-            body: JSON.stringify({ sourceUserId:"testUser" })
-          });
-          const result = await response.json();
-          if(result && result.success) logAction("数据备份成功", { backupId: result.backupId });
-          else throw new Error("备份失败");
-        }catch(e){
-          hideLoading();
-          const cont = await customConfirm("备份失败，是否仍要继续进入设置模式？", "是", "否");
-          if(!cont) return;
-          showLoading("正在进入设置模式...");
-        }
 
         try{
           isAdmin = true;
