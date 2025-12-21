@@ -405,7 +405,7 @@ const HTML_CONTENT = `<!DOCTYPE html>
       background-color:var(--primary);
       color:#fff;border:none;border-radius:4px;
       padding:8px 16px;font-size:13px;
-      cursor:pointer;transition:all .3s ease;
+      cursor:pointer;transition:transform .14s cubic-bezier(.2,.8,.2,1), box-shadow .18s ease, border-color .18s ease;will-change:transform, box-shadow;
       font-weight:500;
     }
     .admin-btn:hover,.login-btn:hover{
@@ -543,7 +543,7 @@ const HTML_CONTENT = `<!DOCTYPE html>
       background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="6" viewBox="0 0 12 6"><path fill="currentColor" d="M0 0l6 6 6-6z"/></svg>');
       background-repeat:no-repeat;
       background-position:right 10px center;
-      cursor:pointer;transition:all .3s ease;
+      cursor:pointer;transition:transform .14s cubic-bezier(.2,.8,.2,1), box-shadow .18s ease, border-color .18s ease;will-change:transform, box-shadow;
       border-radius:0;
     }
     select option{
@@ -653,7 +653,9 @@ const HTML_CONTENT = `<!DOCTYPE html>
       align-items:center;
       gap:10px;
     }
-    .admin-label{
+        .admin-action-right{ width:100%; justify-content:space-between; }
+    .admin-action-right .admin-label{ flex:1; }
+.admin-label{
       font-size:13px;
       font-weight:600;
       color:#1f2937;
@@ -743,7 +745,7 @@ const HTML_CONTENT = `<!DOCTYPE html>
       background:#fff;border-radius:8px;
       padding:12px;width:150px;
       box-shadow:0 3px 10px rgba(0,0,0,.06);
-      cursor:pointer;transition:all .3s ease;
+      cursor:pointer;transition:transform .14s cubic-bezier(.2,.8,.2,1), box-shadow .18s ease, border-color .18s ease;will-change:transform, box-shadow;
       position:relative;user-select:none;
       border-left:3px solid var(--primary);
       animation:fadeIn .3s ease forwards;
@@ -795,10 +797,10 @@ const HTML_CONTENT = `<!DOCTYPE html>
 
     /* 卡片描述提示框（鼠标跟随） */
     #custom-tooltip{
-      position:absolute;display:none;z-index:700;
+      position:fixed;display:none;z-index:99999;
       background:var(--primary);color:#fff;
       padding:6px 10px;border-radius:5px;font-size:12px;
-      pointer-events:none;max-width:300px;white-space:pre-wrap;
+      pointer-events:none;max-width:300px;white-space:pre-wrap;will-change:transform;transform:translate3d(0,0,0);
       box-shadow:0 2px 10px rgba(0,0,0,.2);
       transition:opacity .2s ease;
     }
@@ -1179,8 +1181,9 @@ body.dark-theme .admin-panel-handle{
 
 .admin-panel-hint {
   position: fixed;
-  left: 0;
-  top: 0;
+  right: 26px;
+  top: 50%;
+  transform: translateY(-50%);
   font-size: 12px;
   padding: 4px 6px;
   border-radius: 6px;
@@ -1188,8 +1191,6 @@ body.dark-theme .admin-panel-handle{
   pointer-events: none;
   white-space: nowrap;
   z-index: 3000;
-  display: none; /* 登录后才显示（由 JS 控制） */
-  box-shadow: 0 6px 18px rgba(0,0,0,.18);
 }
 
 .admin-panel-hint{
@@ -1200,6 +1201,12 @@ body.dark-theme .admin-panel-hint{
   background:#fff;
   color:#111;
 }
+
+/* 未登录时隐藏右侧后台拉出按钮与提示；登录后显示 */
+.admin-panel-handle, .admin-panel-hint{ display:none; }
+body.logged-in .admin-panel-handle{ display:block; }
+body.logged-in .admin-panel-hint{ display:inline-block; }
+
 </style>
 </head>
 <body>
@@ -1254,14 +1261,14 @@ body.dark-theme .admin-panel-hint{
     <!-- 管理控制按钮 -->
     <div class="add-remove-controls">
       <div class="admin-panel-title">后台操作</div>
-      <div class="admin-action">
+      <div class="admin-action admin-action-right">
+        <span class="admin-label">0.修改站点名称</span>
         <button class="round-btn" onclick="editSiteTitle()" title="修改站点名称">
           <svg viewBox="0 0 48 48" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
             <path d="M6 42h36" stroke="white" stroke-width="4"/>
             <path d="M14 34l20-20 6 6-20 20H14v-6z" stroke="white" stroke-width="4" fill="none"/>
           </svg>
         </button>
-        <span class="admin-label">0.修改站点名称</span>
       </div>
 
 
@@ -1807,22 +1814,8 @@ body.dark-theme .admin-panel-hint{
       const addRemoveControls = document.querySelector(".add-remove-controls");
       addRemoveControls.style.display = isAdmin ? "flex" : "none";
       updateLoginButton();
-
-      // 右侧“后台操作”把手 + 闪烁提示：仅登录后显示
-      const sideHandle = document.querySelector(".admin-panel-handle");
-      const sideHint = document.querySelector(".admin-panel-hint");
-      if(sideHandle) sideHandle.style.display = isLoggedIn ? "flex" : "none";
-      // 提示仅在已登录且未进入编辑模式时显示（避免干扰）
-      if(sideHint) sideHint.style.display = (isLoggedIn && !isAdmin) ? "block" : "none";
-
-      // 登录/退出后立刻同步位置（不需要滚动才归位）
-      if(isLoggedIn && sideHint && window.__syncAdminHintPosition){
-        requestAnimationFrame(() => window.__syncAdminHintPosition());
-      }
-
       logAction("更新UI状态", { isAdmin: isAdmin, isLoggedIn: isLoggedIn });
     }
-
 
     /* ================= 渲染 ================= */
     function renderSections(){
@@ -1911,6 +1904,7 @@ body.dark-theme .admin-panel-hint{
       card.setAttribute("draggable", isAdmin);
       card.dataset.isPrivate = link.isPrivate;
       card.setAttribute("data-url", link.url);
+      if(link.tips) card.setAttribute("title", link.tips);
 
       const cardIndex = container.children.length;
       card.style.setProperty("--card-index", cardIndex);
@@ -2007,10 +2001,20 @@ body.dark-theme .admin-panel-hint{
       cardActions.appendChild(deleteBtn);
       card.appendChild(cardActions);
 
-      // Hover tooltip: show full bookmark description (link.tips)
-      card.addEventListener("mouseenter", function(e){ handleTooltipMouseMove(e, link.tips, isAdmin); });
-      card.addEventListener("mousemove", function(e){ handleTooltipMouseMove(e, link.tips, isAdmin); });
-      card.addEventListener("mouseleave", handleTooltipMouseLeave);
+
+// Hover tooltip: smoother & more responsive
+const __tipText = link.tips || "";
+const __onTipMove = function(e){ handleTooltipMouseMove(e, __tipText, isAdmin); };
+if(window.PointerEvent){
+  card.addEventListener("pointerenter", __onTipMove);
+  card.addEventListener("pointermove", __onTipMove);
+  card.addEventListener("pointerleave", handleTooltipMouseLeave);
+}else{
+  card.addEventListener("mouseenter", __onTipMove);
+  card.addEventListener("mousemove", __onTipMove);
+  card.addEventListener("mouseleave", handleTooltipMouseLeave);
+}
+
 
       card.addEventListener("dragstart", dragStart);
       card.addEventListener("dragover", dragOver);
@@ -2527,13 +2531,26 @@ body.dark-theme .admin-panel-hint{
     function updateLoginButton(){
       const loginBtn = document.getElementById("login-btn");
       const adminBtn = document.getElementById("admin-btn");
+
+      // 右侧后台拉出按钮 & 提示（仅登录后显示）
+      const handle = document.querySelector(".admin-panel-handle");
+      const hint = document.querySelector(".admin-panel-hint");
+
       if(isLoggedIn){
         loginBtn.textContent = "退出登录";
         adminBtn.style.display = "inline-block";
-        adminBtn.textContent = isAdmin ? "离开设置" : "设置";
+        adminBtn.textContent = isAdmin ? "离开设置" : "设置①";
+
+        document.body.classList.add("logged-in");
+        if(handle) handle.style.display = "block";
+        if(hint) hint.style.display = "inline-block";
       }else{
         loginBtn.textContent = "登录";
         adminBtn.style.display = "none";
+
+        document.body.classList.remove("logged-in");
+        if(handle) handle.style.display = "none";
+        if(hint) hint.style.display = "none";
       }
     }
 
@@ -2617,33 +2634,76 @@ body.dark-theme .admin-panel-hint{
     }
     window.addEventListener("scroll", handleBackToTopVisibility);
 
-    /* ================= Tooltip（卡片tips） ================= */
-    function handleTooltipMouseMove(e, tips, adminMode){
-      const tooltip = document.getElementById("custom-tooltip");
-      if(!tips || adminMode){
-        tooltip.style.display = "none";
-        return;
-      }
-      if(tooltip.textContent !== tips) tooltip.textContent = tips;
-      tooltip.style.display = "block";
+    
+/* ================= Tooltip（卡片tips） ================= */
+let __tooltipRAF = 0;
+const __tooltipState = { x: 0, y: 0, tips: "", adminMode: false };
 
-      const offsetX = 15, offsetY = 10;
-      const rect = tooltip.getBoundingClientRect();
-      const pageWidth = window.innerWidth;
-      const pageHeight = window.innerHeight;
+function __renderTooltip(){
+  __tooltipRAF = 0;
+  const tooltip = document.getElementById("custom-tooltip");
+  if(!tooltip) return;
 
-      let left = e.pageX + offsetX;
-      let top = e.pageY + offsetY;
+  const tips = __tooltipState.tips;
+  const adminMode = __tooltipState.adminMode;
 
-      if(pageWidth - e.clientX < 200) left = e.pageX - rect.width - offsetX;
-      if(pageHeight - e.clientY < 100) top = e.pageY - rect.height - offsetY;
+  if(!tips || adminMode){
+    tooltip.style.display = "none";
+    return;
+  }
 
-      tooltip.style.left = left + "px";
-      tooltip.style.top = top + "px";
-    }
-    function handleTooltipMouseLeave(){
-      document.getElementById("custom-tooltip").style.display = "none";
-    }
+  if(tooltip.textContent !== tips) tooltip.textContent = tips;
+  if(tooltip.style.display !== "block") tooltip.style.display = "block";
+
+  const offsetX = 14, offsetY = 10;
+  const x = __tooltipState.x;
+  const y = __tooltipState.y;
+
+  // Use transform for smoother updates (less layout thrash than left/top).
+  const w = tooltip.offsetWidth || 0;
+  const h = tooltip.offsetHeight || 0;
+
+  let left = x + offsetX;
+  let top = y + offsetY;
+
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+
+  // Keep tooltip within viewport with a small padding
+  const pad = 8;
+  if(left + w + pad > vw) left = x - w - offsetX;
+  if(top + h + pad > vh) top = y - h - offsetY;
+
+  // Clamp
+  if(left < pad) left = pad;
+  if(top < pad) top = pad;
+
+  tooltip.style.transform = "translate3d(" + left + "px," + top + "px,0)";
+}
+
+function handleTooltipMouseMove(e, tips, adminMode){
+  const tooltip = document.getElementById("custom-tooltip");
+  if(!tooltip) return;
+
+  __tooltipState.tips = tips || "";
+  __tooltipState.adminMode = !!adminMode;
+
+  // clientX/Y works with fixed positioning & scrolling.
+  __tooltipState.x = (typeof e.clientX === "number") ? e.clientX : 0;
+  __tooltipState.y = (typeof e.clientY === "number") ? e.clientY : 0;
+
+  if(__tooltipRAF) return;
+  __tooltipRAF = requestAnimationFrame(__renderTooltip);
+}
+
+function handleTooltipMouseLeave(){
+  __tooltipState.tips = "";
+  __tooltipState.adminMode = false;
+
+  const tooltip = document.getElementById("custom-tooltip");
+  if(tooltip) tooltip.style.display = "none";
+}
+
 
     /* ================= 书签搜索 ================= */
     function searchBookmarks(query){
@@ -3167,59 +3227,24 @@ document.addEventListener("DOMContentLoaded", () => {
   const handle = document.querySelector(".admin-panel-handle");
   if (!handle) return;
 
-  // 避免重复创建
   if (document.querySelector(".admin-panel-hint")) return;
 
   const hint = document.createElement("span");
   hint.className = "admin-panel-hint";
   hint.textContent = "点我②";
+
   document.body.appendChild(hint);
 
-  // 让提示始终固定在侧边 handle 的左侧（不随滚动错位）
-  window.__syncAdminHintPosition = function(){
-    const handleEl = document.querySelector(".admin-panel-handle");
-    const hintEl = document.querySelector(".admin-panel-hint");
-    if(!handleEl || !hintEl) return;
-
-    // 只有显示时才计算，避免 offsetWidth=0
-    const hintVisible = (hintEl.style.display !== "none") && (getComputedStyle(hintEl).display !== "none");
-    if(!hintVisible) return;
-
-    const rect = handleEl.getBoundingClientRect();
-    if(rect.width === 0 && rect.height === 0) return;
-
-    const gap = 10;
-    const hintW = hintEl.offsetWidth || 0;
-    const hintH = hintEl.offsetHeight || 0;
-
-    // 贴在 handle 左边，垂直居中
-    let left = rect.left - hintW - gap;
-    let top = rect.top + rect.height / 2 - hintH / 2;
-
-    // 边界保护（防止跑出屏幕）
-    left = Math.max(8, Math.min(left, window.innerWidth - hintW - 8));
-    top  = Math.max(8, Math.min(top,  window.innerHeight - hintH - 8));
-
-    hintEl.style.left = left + "px";
-    hintEl.style.top  = top + "px";
+  const syncPosition = () => {
+    const rect = handle.getBoundingClientRect();
+    hint.style.top = (rect.top + rect.height / 2) + "px";
   };
 
-  // 合帧更新，滚动/缩放更稳
-  let raf = 0;
-  const schedule = () => {
-    if(raf) return;
-    raf = requestAnimationFrame(() => {
-      raf = 0;
-      window.__syncAdminHintPosition();
-    });
-  };
-
-  schedule();
-  window.addEventListener("scroll", schedule, { passive: true });
-  window.addEventListener("resize", schedule);
+  syncPosition();
+  window.addEventListener("scroll", syncPosition);
+  window.addEventListener("resize", syncPosition);
 });
 </script>
-
 
 </body>
 </html>
