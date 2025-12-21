@@ -405,7 +405,7 @@ const HTML_CONTENT = `<!DOCTYPE html>
       background-color:var(--primary);
       color:#fff;border:none;border-radius:4px;
       padding:8px 16px;font-size:13px;
-      cursor:pointer;transition:all .3s ease;
+      cursor:pointer;transition:transform .14s cubic-bezier(.2,.8,.2,1), box-shadow .18s ease, border-color .18s ease;will-change:transform, box-shadow;
       font-weight:500;
     }
     .admin-btn:hover,.login-btn:hover{
@@ -543,7 +543,7 @@ const HTML_CONTENT = `<!DOCTYPE html>
       background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="6" viewBox="0 0 12 6"><path fill="currentColor" d="M0 0l6 6 6-6z"/></svg>');
       background-repeat:no-repeat;
       background-position:right 10px center;
-      cursor:pointer;transition:all .3s ease;
+      cursor:pointer;transition:transform .14s cubic-bezier(.2,.8,.2,1), box-shadow .18s ease, border-color .18s ease;will-change:transform, box-shadow;
       border-radius:0;
     }
     select option{
@@ -743,7 +743,7 @@ const HTML_CONTENT = `<!DOCTYPE html>
       background:#fff;border-radius:8px;
       padding:12px;width:150px;
       box-shadow:0 3px 10px rgba(0,0,0,.06);
-      cursor:pointer;transition:all .3s ease;
+      cursor:pointer;transition:transform .14s cubic-bezier(.2,.8,.2,1), box-shadow .18s ease, border-color .18s ease;will-change:transform, box-shadow;
       position:relative;user-select:none;
       border-left:3px solid var(--primary);
       animation:fadeIn .3s ease forwards;
@@ -798,7 +798,7 @@ const HTML_CONTENT = `<!DOCTYPE html>
       position:fixed;display:none;z-index:99999;
       background:var(--primary);color:#fff;
       padding:6px 10px;border-radius:5px;font-size:12px;
-      pointer-events:none;max-width:300px;white-space:pre-wrap;
+      pointer-events:none;max-width:300px;white-space:pre-wrap;will-change:transform;transform:translate3d(0,0,0);
       box-shadow:0 2px 10px rgba(0,0,0,.2);
       transition:opacity .2s ease;
     }
@@ -1993,10 +1993,20 @@ body.dark-theme .admin-panel-hint{
       cardActions.appendChild(deleteBtn);
       card.appendChild(cardActions);
 
-      // Hover tooltip: show full bookmark description (link.tips)
-      card.addEventListener("mouseenter", function(e){ handleTooltipMouseMove(e, link.tips, isAdmin); });
-      card.addEventListener("mousemove", function(e){ handleTooltipMouseMove(e, link.tips, isAdmin); });
-      card.addEventListener("mouseleave", handleTooltipMouseLeave);
+
+// Hover tooltip: smoother & more responsive
+const __tipText = link.tips || "";
+const __onTipMove = function(e){ handleTooltipMouseMove(e, __tipText, isAdmin); };
+if(window.PointerEvent){
+  card.addEventListener("pointerenter", __onTipMove);
+  card.addEventListener("pointermove", __onTipMove);
+  card.addEventListener("pointerleave", handleTooltipMouseLeave);
+}else{
+  card.addEventListener("mouseenter", __onTipMove);
+  card.addEventListener("mousemove", __onTipMove);
+  card.addEventListener("mouseleave", handleTooltipMouseLeave);
+}
+
 
       card.addEventListener("dragstart", dragStart);
       card.addEventListener("dragover", dragOver);
@@ -2603,43 +2613,76 @@ body.dark-theme .admin-panel-hint{
     }
     window.addEventListener("scroll", handleBackToTopVisibility);
 
-    /* ================= Tooltip（卡片tips） ================= */
-    function handleTooltipMouseMove(e, tips, adminMode){
-      const tooltip = document.getElementById("custom-tooltip");
-      if(!tooltip) return;
+    
+/* ================= Tooltip（卡片tips） ================= */
+let __tooltipRAF = 0;
+const __tooltipState = { x: 0, y: 0, tips: "", adminMode: false };
 
-      if(!tips || adminMode){
-        tooltip.style.display = "none";
-        return;
-      }
+function __renderTooltip(){
+  __tooltipRAF = 0;
+  const tooltip = document.getElementById("custom-tooltip");
+  if(!tooltip) return;
 
-      if(tooltip.textContent !== tips) tooltip.textContent = tips;
-      tooltip.style.display = "block";
+  const tips = __tooltipState.tips;
+  const adminMode = __tooltipState.adminMode;
 
-      const offsetX = 15, offsetY = 10;
+  if(!tips || adminMode){
+    tooltip.style.display = "none";
+    return;
+  }
 
-      // Use viewport coordinates so it works reliably with fixed headers / scrolling.
-      const rect = tooltip.getBoundingClientRect();
-      const pageWidth = window.innerWidth;
-      const pageHeight = window.innerHeight;
+  if(tooltip.textContent !== tips) tooltip.textContent = tips;
+  if(tooltip.style.display !== "block") tooltip.style.display = "block";
 
-      const cx = (typeof e.clientX === "number") ? e.clientX : 0;
-      const cy = (typeof e.clientY === "number") ? e.clientY : 0;
+  const offsetX = 14, offsetY = 10;
+  const x = __tooltipState.x;
+  const y = __tooltipState.y;
 
-      let left = cx + offsetX;
-      let top = cy + offsetY;
+  // Use transform for smoother updates (less layout thrash than left/top).
+  const w = tooltip.offsetWidth || 0;
+  const h = tooltip.offsetHeight || 0;
 
-      // Keep tooltip within viewport
-      if(pageWidth - cx < 200) left = cx - rect.width - offsetX;
-      if(pageHeight - cy < 100) top = cy - rect.height - offsetY;
+  let left = x + offsetX;
+  let top = y + offsetY;
 
-      tooltip.style.left = left + "px";
-      tooltip.style.top = top + "px";
-    }
-    function handleTooltipMouseLeave(){
-      const tooltip = document.getElementById("custom-tooltip");
-      if(tooltip) tooltip.style.display = "none";
-    }
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+
+  // Keep tooltip within viewport with a small padding
+  const pad = 8;
+  if(left + w + pad > vw) left = x - w - offsetX;
+  if(top + h + pad > vh) top = y - h - offsetY;
+
+  // Clamp
+  if(left < pad) left = pad;
+  if(top < pad) top = pad;
+
+  tooltip.style.transform = "translate3d(" + left + "px," + top + "px,0)";
+}
+
+function handleTooltipMouseMove(e, tips, adminMode){
+  const tooltip = document.getElementById("custom-tooltip");
+  if(!tooltip) return;
+
+  __tooltipState.tips = tips || "";
+  __tooltipState.adminMode = !!adminMode;
+
+  // clientX/Y works with fixed positioning & scrolling.
+  __tooltipState.x = (typeof e.clientX === "number") ? e.clientX : 0;
+  __tooltipState.y = (typeof e.clientY === "number") ? e.clientY : 0;
+
+  if(__tooltipRAF) return;
+  __tooltipRAF = requestAnimationFrame(__renderTooltip);
+}
+
+function handleTooltipMouseLeave(){
+  __tooltipState.tips = "";
+  __tooltipState.adminMode = false;
+
+  const tooltip = document.getElementById("custom-tooltip");
+  if(tooltip) tooltip.style.display = "none";
+}
+
 
     /* ================= 书签搜索 ================= */
     function searchBookmarks(query){
