@@ -1324,7 +1324,7 @@ body.dark-theme .admin-panel-hint{
           <path d="M10 10h28" stroke="white" stroke-width="4" stroke-linecap="round"/>
         </svg>
       </button>
-        <span class="admin-label">6 导入数据（覆盖恢复）</span>
+        <span class="admin-label">6.导入数据（覆盖恢复）</span>
       </div>
 
       <input type="file" id="import-file" accept="application/json" style="display:none;" />
