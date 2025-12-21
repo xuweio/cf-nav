@@ -653,7 +653,9 @@ const HTML_CONTENT = `<!DOCTYPE html>
       align-items:center;
       gap:10px;
     }
-    .admin-label{
+        .admin-action-right{ width:100%; justify-content:space-between; }
+    .admin-action-right .admin-label{ flex:1; }
+.admin-label{
       font-size:13px;
       font-weight:600;
       color:#1f2937;
@@ -1259,14 +1261,14 @@ body.logged-in .admin-panel-hint{ display:inline-block; }
     <!-- 管理控制按钮 -->
     <div class="add-remove-controls">
       <div class="admin-panel-title">后台操作</div>
-      <div class="admin-action">
+      <div class="admin-action admin-action-right">
+        <span class="admin-label">0.修改站点名称</span>
         <button class="round-btn" onclick="editSiteTitle()" title="修改站点名称">
           <svg viewBox="0 0 48 48" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
             <path d="M6 42h36" stroke="white" stroke-width="4"/>
             <path d="M14 34l20-20 6 6-20 20H14v-6z" stroke="white" stroke-width="4" fill="none"/>
           </svg>
         </button>
-        <span class="admin-label">0.修改站点名称</span>
       </div>
 
 
