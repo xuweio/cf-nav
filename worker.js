@@ -1,4 +1,4 @@
-// Nav-CF Worker - FINAL SMART AI (OpenAI-first, explicit source)
+// Nav-CF Worker - FINAL CLEAN FULL VERSION
 // KV Binding: CARD_ORDER
 // Env:
 // - ADMIN_PASSWORD
@@ -6,13 +6,15 @@
 
 import { SEED_DATA, SEED_USER_ID } from "./db.js";
 
-function cleanDomain(hostname){
+/* ================= 工具函数 ================= */
+function cleanDomain(hostname) {
   return hostname
     .replace(/^www\./, "")
     .replace(/^cn\./, "")
     .split(".")[0];
 }
 
+/* ================= Worker 主体 ================= */
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -45,15 +47,13 @@ export default {
       const aiKey = env.AI_API_KEY || "";
       const canUseAI = aiKey.startsWith("sk-") && !aiKey.includes("xxxx");
 
-      /* ---------- OpenAI FIRST ---------- */
+      /* ---------- OpenAI 优先 ---------- */
       if (canUseAI) {
         try {
           const prompt = `你是一个中文网站导航编辑。
-请根据网址生成高质量信息：
-
-要求：
-- 名称：完整、自然，不要简称
-- 描述：10~15 字，概括网站主要用途
+请根据网址生成导航信息：
+- 名称：完整、自然
+- 描述：10~15字，概括主要用途
 
 网址：${targetUrl}
 
@@ -84,12 +84,10 @@ export default {
               });
             }
           }
-        } catch (e) {
-          console.log("OpenAI failed, fallback used");
-        }
+        } catch {}
       }
 
-      /* ---------- CF SMART FALLBACK ---------- */
+      /* ---------- Worker 智能兜底 ---------- */
       let fallbackDesc = "官方网站入口";
       if (domain === "uptodown") fallbackDesc = "应用与软件下载平台";
       if (domain === "github") fallbackDesc = "开源代码托管平台";
@@ -102,7 +100,7 @@ export default {
       });
     }
 
-    /* ================= PAGE ================= */
+    /* ================= 页面 ================= */
     if (url.pathname === "/") {
       return new Response(HTML_CONTENT, {
         headers: { "content-type": "text/html; charset=UTF-8" }
@@ -129,11 +127,7 @@ export default {
   }
 };
 
-const HTML_CONTENT = `<!doctype html>
-<!-- 使用你现有的 Nav-CF HTML，不需要改 -->
-`;
-
-
+/* ================= HTML 内容（仅此一处） ================= */
 const HTML_CONTENT = `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
