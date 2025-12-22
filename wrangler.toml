@@ -10,3 +10,4 @@ preview_id = ""
 
 [vars]
 ADMIN_PASSWORD = "root"
+AI_API_KEY = "你的openaiapi=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
