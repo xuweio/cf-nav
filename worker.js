@@ -2555,7 +2555,7 @@ if(window.PointerEvent){
     }
 
     function openGitHub(){
-      window.open("https://github.com/hmhm2022/Nav-CF", "_blank");
+      window.open("https://github.com/djkyc/cf-nav", "_blank");
       logAction("访问GitHub仓库");
     }
 
