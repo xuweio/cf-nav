@@ -18,3 +18,12 @@ https://deploy.workers.cloudflare.com/?url=https://github.com/djkyc/cf-nav
 
 
 
+![GitHub stars](https://img.shields.io/github/stars/djkyc/cf-nav)
+
+![Stars](https://img.shields.io/github/stars/djkyc/cf-nav?style=social)
+
+## ⭐ Star History
+
+<!-- Star History -->
+## ⭐ Star History
+[![Star History Chart](https://api.star-history.com/svg?repos=djkyc/cf-nav&type=Date)](https://star-history.com/#djkyc/cf-nav&Date)
